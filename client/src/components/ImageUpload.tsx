@@ -4,7 +4,7 @@ import { X, Upload, Image } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 // Hàm nén hình ảnh trước khi chuyển sang base64
-const resizeImage = (file: File, maxWidth = 800, maxHeight = 600): Promise<string> => {
+const resizeImage = (file: File, maxWidth = 600, maxHeight = 450): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -39,8 +39,8 @@ const resizeImage = (file: File, maxWidth = 800, maxHeight = 600): Promise<strin
         
         ctx.drawImage(img, 0, 0, width, height);
         
-        // Convert to JPEG with quality 80% to reduce size
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
+        // Convert to JPEG with quality 60% to reduce size further
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.6);
         resolve(dataUrl);
       };
       img.onerror = () => {
@@ -82,7 +82,7 @@ export default function ImageUpload({ onImagesUploaded }: ImageUploadProps) {
     for (const file of fileArray) {
       try {
         // Nén hình ảnh trước khi chuyển thành base64
-        const resizedImage = await resizeImage(file, 800, 600);
+        const resizedImage = await resizeImage(file, 600, 450);
         newImages.push(resizedImage);
       } catch (error) {
         console.error("Error processing image:", error);
