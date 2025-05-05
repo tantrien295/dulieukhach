@@ -53,6 +53,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ errors: error.errors });
       }
       console.error('Error creating customer:', error);
+      // Kiểm tra lỗi kết nối
+      if (error instanceof Error && 
+          (error.message.includes('ECONNREFUSED') || 
+           error.message.includes('connection') ||
+           error.message.includes('timeout'))) {
+        return res.status(503).json({ 
+          error: 'Không thể kết nối với cơ sở dữ liệu, vui lòng thử lại sau' 
+        });
+      }
       return res.status(500).json({ error: 'Internal server error' });
     }
   });
