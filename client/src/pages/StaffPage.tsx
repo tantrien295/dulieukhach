@@ -51,17 +51,17 @@ export default function StaffPage() {
   return (
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Staff Management</h1>
+        <h1 className="text-3xl font-bold">Quản Lý Nhân Viên</h1>
         <Button onClick={() => setIsCreateStaffOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
-          Add Staff
+          Thêm Nhân Viên
         </Button>
       </div>
 
       <div className="mb-6 relative">
         <Search className="absolute top-3 left-3 h-4 w-4 text-gray-400" />
         <Input
-          placeholder="Search staff..."
+          placeholder="Tìm kiếm nhân viên..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-10 max-w-md"
@@ -70,11 +70,11 @@ export default function StaffPage() {
 
       {isLoading ? (
         <div className="flex justify-center">
-          <p>Loading staff members...</p>
+          <p>Đang tải dữ liệu nhân viên...</p>
         </div>
       ) : filteredStaff?.length === 0 ? (
         <div className="text-center p-6">
-          <p>No staff members found. Add your first staff member!</p>
+          <p>Không tìm thấy nhân viên nào. Hãy thêm nhân viên đầu tiên!</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -88,13 +88,13 @@ export default function StaffPage() {
       <Dialog open={isCreateStaffOpen} onOpenChange={setIsCreateStaffOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add New Staff Member</DialogTitle>
+            <DialogTitle>Thêm Nhân Viên Mới</DialogTitle>
             <DialogDescription>
-              Create a new staff profile with contact information and service assignments.
+              Tạo hồ sơ nhân viên mới với thông tin liên hệ và gán dịch vụ.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
-            <p>Staff form will go here</p>
+            <p>Biểu mẫu nhân viên sẽ hiển thị ở đây</p>
             {/* TODO: Add staff form component */}
           </div>
         </DialogContent>
@@ -140,15 +140,15 @@ function StaffCard({ staff }: StaffCardProps) {
           
           {serviceAssignments.length > 0 && (
             <div className="mt-4">
-              <h4 className="text-sm font-medium mb-2">Services</h4>
+              <h4 className="text-sm font-medium mb-2">Dịch Vụ</h4>
               <div className="flex flex-wrap gap-2">
                 {serviceAssignments.slice(0, 3).map((assignment, index: number) => (
                   <Badge key={index} variant="outline">
-                    {assignment.serviceType?.name || 'Unknown service'}
+                    {assignment.serviceType?.name || 'Dịch vụ không xác định'}
                   </Badge>
                 ))}
                 {serviceAssignments.length > 3 && (
-                  <Badge variant="outline">+{serviceAssignments.length - 3} more</Badge>
+                  <Badge variant="outline">+{serviceAssignments.length - 3} khác</Badge>
                 )}
               </div>
             </div>
@@ -157,9 +157,9 @@ function StaffCard({ staff }: StaffCardProps) {
       </CardContent>
       <CardFooter className="justify-between">
         <Link href={`/staff/${staff.id}`}>
-          <Button variant="outline" size="sm">View Profile</Button>
+          <Button variant="outline" size="sm">Xem Hồ Sơ</Button>
         </Link>
-        <Button variant="outline" size="sm">Edit</Button>
+        <Button variant="outline" size="sm">Sửa</Button>
       </CardFooter>
     </Card>
   );

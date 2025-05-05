@@ -50,17 +50,17 @@ export default function ServicesPage() {
   return (
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Services Management</h1>
+        <h1 className="text-3xl font-bold">Quản Lý Dịch Vụ</h1>
         <div className="space-x-2">
           {activeTab === "categories" ? (
             <Button onClick={() => setIsCreateCategoryOpen(true)}>
               <Plus className="h-4 w-4 mr-2" />
-              Add Category
+              Thêm Danh Mục
             </Button>
           ) : (
             <Button onClick={() => setIsCreateServiceTypeOpen(true)}>
               <Plus className="h-4 w-4 mr-2" />
-              Add Service
+              Thêm Dịch Vụ
             </Button>
           )}
         </div>
@@ -68,7 +68,7 @@ export default function ServicesPage() {
 
       <div className="mb-6">
         <Input
-          placeholder="Search services..."
+          placeholder="Tìm kiếm dịch vụ..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="max-w-md"
@@ -77,18 +77,18 @@ export default function ServicesPage() {
 
       <Tabs defaultValue="categories" onValueChange={setActiveTab}>
         <TabsList className="mb-6">
-          <TabsTrigger value="categories">Categories</TabsTrigger>
-          <TabsTrigger value="services">Service Types</TabsTrigger>
+          <TabsTrigger value="categories">Danh Mục</TabsTrigger>
+          <TabsTrigger value="services">Loại Dịch Vụ</TabsTrigger>
         </TabsList>
 
         <TabsContent value="categories">
           {categoriesLoading ? (
             <div className="flex justify-center">
-              <p>Loading categories...</p>
+              <p>Đang tải danh mục...</p>
             </div>
           ) : filteredCategories?.length === 0 ? (
             <div className="text-center p-6">
-              <p>No service categories found. Add your first category!</p>
+              <p>Không tìm thấy danh mục dịch vụ nào. Hãy thêm danh mục đầu tiên!</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -102,11 +102,11 @@ export default function ServicesPage() {
         <TabsContent value="services">
           {serviceTypesLoading ? (
             <div className="flex justify-center">
-              <p>Loading service types...</p>
+              <p>Đang tải loại dịch vụ...</p>
             </div>
           ) : filteredServiceTypes?.length === 0 ? (
             <div className="text-center p-6">
-              <p>No service types found. Add your first service!</p>
+              <p>Không tìm thấy loại dịch vụ nào. Hãy thêm dịch vụ đầu tiên!</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
