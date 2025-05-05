@@ -48,9 +48,9 @@ export default function CustomerDetailPage() {
   if (!customerId) {
     return (
       <div className="p-8 text-center">
-        <p>Customer not found.</p>
+        <p>Không tìm thấy khách hàng.</p>
         <button className="mt-4 btn-primary" onClick={handleBack}>
-          Go back to customers
+          Quay lại danh sách khách hàng
         </button>
       </div>
     );
@@ -79,9 +79,9 @@ export default function CustomerDetailPage() {
   if (!customer) {
     return (
       <div className="p-8 text-center">
-        <p>Customer not found or has been deleted.</p>
+        <p>Không tìm thấy khách hàng hoặc đã bị xóa.</p>
         <button className="mt-4 btn-primary" onClick={handleBack}>
-          Go back to customers
+          Quay lại danh sách khách hàng
         </button>
       </div>
     );
@@ -114,7 +114,7 @@ export default function CustomerDetailPage() {
               onClick={toggleServiceForm}
             >
               <Plus className="h-5 w-5 mr-1" />
-              Add Service
+              Thêm Dịch Vụ
             </button>
             <button className="text-neutral-dark hover:text-[#5C6BC0] p-1 ml-2" title="More options">
               <MoreHorizontal className="h-5 w-5" />
@@ -130,27 +130,27 @@ export default function CustomerDetailPage() {
           <div className="lg:col-span-1">
             <div className="card">
               <div className="card-header">
-                <h3 className="font-semibold">Customer Information</h3>
+                <h3 className="font-semibold">Thông Tin Khách Hàng</h3>
               </div>
               <div className="card-content">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-neutral-dark mb-1">Full Name</label>
+                    <label className="block text-sm text-neutral-dark mb-1">Họ Tên</label>
                     <div className="font-medium">{customer.name}</div>
                   </div>
                   <div>
-                    <label className="block text-sm text-neutral-dark mb-1">Phone Number</label>
+                    <label className="block text-sm text-neutral-dark mb-1">Số Điện Thoại</label>
                     <div className="font-medium">{formatPhone(customer.phone)}</div>
                   </div>
                   {customer.birthdate && (
                     <div>
-                      <label className="block text-sm text-neutral-dark mb-1">Birth Date</label>
+                      <label className="block text-sm text-neutral-dark mb-1">Ngày Sinh</label>
                       <div className="font-medium">{formatDate(customer.birthdate)}</div>
                     </div>
                   )}
                   {customer.address && (
                     <div>
-                      <label className="block text-sm text-neutral-dark mb-1">Address</label>
+                      <label className="block text-sm text-neutral-dark mb-1">Địa Chỉ</label>
                       <div className="font-medium whitespace-pre-line">{customer.address}</div>
                     </div>
                   )}
@@ -162,7 +162,7 @@ export default function CustomerDetailPage() {
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                       </svg>
-                      Edit Information
+                      Sửa Thông Tin
                     </button>
                   </div>
                 </div>
@@ -209,28 +209,28 @@ function CustomerSummary({ customerId, visitCount }: CustomerSummaryProps) {
   return (
     <div className="card mt-6">
       <div className="card-header">
-        <h3 className="font-semibold">Customer Summary</h3>
+        <h3 className="font-semibold">Tóm Tắt Khách Hàng</h3>
       </div>
       <div className="card-content">
         <div className="grid grid-cols-2 gap-4">
           <div className="p-3 bg-[#F5F7FA] rounded-lg">
-            <div className="text-sm text-neutral-dark">Total Visits</div>
+            <div className="text-sm text-neutral-dark">Tổng Lượt Đến</div>
             <div className="text-xl font-semibold mt-1">{visitCount}</div>
           </div>
           <div className="p-3 bg-[#F5F7FA] rounded-lg">
-            <div className="text-sm text-neutral-dark">First Visit</div>
+            <div className="text-sm text-neutral-dark">Lần Đầu Đến</div>
             <div className="text-sm font-medium mt-1">
               {summaryData?.firstVisit ? formatDate(summaryData.firstVisit) : 'N/A'}
             </div>
           </div>
           <div className="p-3 bg-[#F5F7FA] rounded-lg">
-            <div className="text-sm text-neutral-dark">Last Visit</div>
+            <div className="text-sm text-neutral-dark">Lần Cuối Đến</div>
             <div className="text-sm font-medium mt-1">
               {summaryData?.lastVisit ? formatDate(summaryData.lastVisit) : 'N/A'}
             </div>
           </div>
           <div className="p-3 bg-[#F5F7FA] rounded-lg">
-            <div className="text-sm text-neutral-dark">Favorite Service</div>
+            <div className="text-sm text-neutral-dark">Dịch Vụ Ưa Thích</div>
             <div className="text-sm font-medium mt-1">
               {summaryData?.favoriteService || 'N/A'}
             </div>

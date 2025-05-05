@@ -79,18 +79,18 @@ export default function ServiceHistory({ customerId, onAddServiceClick }: Servic
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Service History</CardTitle>
+        <CardTitle>Lịch Sử Dịch Vụ</CardTitle>
         <Button size="sm" onClick={onAddServiceClick}>
-          <Plus className="h-4 w-4 mr-2" /> Add Service
+          <Plus className="h-4 w-4 mr-2" /> Thêm Dịch Vụ
         </Button>
       </CardHeader>
       <CardContent>
         {!services || services.length === 0 ? (
           <div className="text-center py-10 text-gray-500">
             <Scissors className="h-8 w-8 mx-auto mb-2" />
-            <p>No services recorded yet</p>
+            <p>Chưa có dịch vụ nào được ghi nhận</p>
             <Button variant="outline" className="mt-2" onClick={onAddServiceClick}>
-              Record First Service
+              Thêm Dịch Vụ Đầu Tiên
             </Button>
           </div>
         ) : (
@@ -151,7 +151,7 @@ export default function ServiceHistory({ customerId, onAddServiceClick }: Servic
       <Dialog open={isServiceFormOpen} onOpenChange={setIsServiceFormOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Edit Service</DialogTitle>
+            <DialogTitle>Sửa Dịch Vụ</DialogTitle>
           </DialogHeader>
           {selectedService && (
             <ServiceForm 
