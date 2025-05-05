@@ -122,18 +122,18 @@ export default function CustomerForm({ customer, isEditing = false }: CustomerFo
       }
       
       toast({
-        title: isEditing ? "Customer updated" : "Customer added",
+        title: isEditing ? "Đã cập nhật khách hàng" : "Đã thêm khách hàng",
         description: isEditing 
-          ? "Customer information has been updated successfully." 
-          : "New customer has been added successfully.",
+          ? "Thông tin khách hàng đã được cập nhật thành công." 
+          : "Khách hàng mới đã được thêm thành công.",
       });
       
       navigate(customerId ? `/customers/${customerId}` : '/');
     },
     onError: (error) => {
       toast({
-        title: "Error",
-        description: `Failed to ${isEditing ? 'update' : 'add'} customer: ${error.message}`,
+        title: "Lỗi",
+        description: `Không thể ${isEditing ? 'cập nhật' : 'thêm'} khách hàng: ${error.message}`,
         variant: "destructive"
       });
     }
@@ -184,11 +184,11 @@ export default function CustomerForm({ customer, isEditing = false }: CustomerFo
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-1">Phone Number*</label>
+                    <label className="block text-sm font-medium mb-1">Số Điện Thoại*</label>
                     <input 
                       type="tel" 
                       className={`form-input ${errors.phone ? 'border-red-500' : ''}`}
-                      placeholder="(555) 123-4567" 
+                      placeholder="0901234567" 
                       {...register("phone")}
                     />
                     {errors.phone && (
@@ -198,7 +198,7 @@ export default function CustomerForm({ customer, isEditing = false }: CustomerFo
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1">Birth Date</label>
+                  <label className="block text-sm font-medium mb-1">Ngày Sinh</label>
                   <input 
                     type="date" 
                     className="form-input"
@@ -207,17 +207,17 @@ export default function CustomerForm({ customer, isEditing = false }: CustomerFo
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1">Address</label>
+                  <label className="block text-sm font-medium mb-1">Địa Chỉ</label>
                   <input 
                     type="text" 
                     className="form-input mb-2"
-                    placeholder="Street Address" 
+                    placeholder="Số nhà, tên đường" 
                     {...register("addressLine1")}
                   />
                   <input 
                     type="text" 
                     className="form-input mb-2"
-                    placeholder="Apt, Suite, etc. (optional)" 
+                    placeholder="Căn hộ, tòa nhà, v.v. (nếu có)" 
                     {...register("addressLine2")}
                   />
                   
@@ -225,30 +225,30 @@ export default function CustomerForm({ customer, isEditing = false }: CustomerFo
                     <input 
                       type="text" 
                       className="form-input"
-                      placeholder="City" 
+                      placeholder="Quận/Huyện" 
                       {...register("city")}
                     />
                     <input 
                       type="text" 
                       className="form-input"
-                      placeholder="State" 
+                      placeholder="Tỉnh/Thành phố" 
                       {...register("state")}
                     />
                     <input 
                       type="text" 
                       className="form-input"
-                      placeholder="ZIP Code" 
+                      placeholder="Mã bưu điện" 
                       {...register("zipCode")}
                     />
                   </div>
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1">Additional Notes</label>
+                  <label className="block text-sm font-medium mb-1">Ghi Chú Thêm</label>
                   <textarea 
                     rows={3} 
                     className="form-textarea"
-                    placeholder="Enter any special notes, preferences, or health concerns..." 
+                    placeholder="Nhập ghi chú đặc biệt, sở thích, hoặc vấn đề sức khỏe..." 
                     {...register("notes")}
                   ></textarea>
                 </div>
@@ -260,14 +260,14 @@ export default function CustomerForm({ customer, isEditing = false }: CustomerFo
                     onClick={() => navigate(customer ? `/customers/${customer.id}` : '/')}
                     disabled={isSubmitting}
                   >
-                    Cancel
+                    Hủy
                   </button>
                   <button 
                     type="submit" 
                     className="btn-primary"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? "Saving..." : isEditing ? "Update Customer" : "Save Customer"}
+                    {isSubmitting ? "Đang lưu..." : isEditing ? "Cập Nhật Khách Hàng" : "Lưu Khách Hàng"}
                   </button>
                 </div>
               </form>
