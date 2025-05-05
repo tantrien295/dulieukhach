@@ -446,6 +446,15 @@ export async function removeServiceFromStaff(assignmentId: number) {
   return !!deletedAssignment;
 }
 
+// Function to get all services for reports
+export async function getAllServices() {
+  const allServices = await db.query.services.findMany({
+    orderBy: desc(services.serviceDate)
+  });
+
+  return allServices;
+}
+
 export const storage = {
   getCustomersWithSummary,
   getCustomerById,
@@ -460,6 +469,7 @@ export const storage = {
   getServiceImages,
   addServiceImage,
   deleteServiceImage,
+  getAllServices,
   
   // Staff-related functions
   getStaffMembers,
