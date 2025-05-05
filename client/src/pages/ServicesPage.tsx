@@ -122,13 +122,13 @@ export default function ServicesPage() {
       <Dialog open={isCreateCategoryOpen} onOpenChange={setIsCreateCategoryOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add New Category</DialogTitle>
+            <DialogTitle>Thêm Danh Mục Mới</DialogTitle>
             <DialogDescription>
-              Create a new service category to organize your services.
+              Tạo danh mục dịch vụ mới để tổ chức các dịch vụ của bạn.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
-            <p>Category form will go here</p>
+            <p>Biểu mẫu danh mục sẽ hiển thị ở đây</p>
             {/* TODO: Add category form component */}
           </div>
         </DialogContent>
@@ -138,13 +138,13 @@ export default function ServicesPage() {
       <Dialog open={isCreateServiceTypeOpen} onOpenChange={setIsCreateServiceTypeOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add New Service</DialogTitle>
+            <DialogTitle>Thêm Dịch Vụ Mới</DialogTitle>
             <DialogDescription>
-              Create a new service type with pricing and duration.
+              Tạo loại dịch vụ mới với giá và thời gian thực hiện.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
-            <p>Service type form will go here</p>
+            <p>Biểu mẫu dịch vụ sẽ hiển thị ở đây</p>
             {/* TODO: Add service type form component */}
           </div>
         </DialogContent>
@@ -162,11 +162,11 @@ function ServiceCategoryCard({ category }: ServiceCategoryCardProps) {
     <Card>
       <CardHeader>
         <CardTitle>{category.name}</CardTitle>
-        <CardDescription>{category.description || "No description"}</CardDescription>
+        <CardDescription>{category.description || "Chưa có mô tả"}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex justify-end">
-          <Button variant="outline" size="sm">Edit</Button>
+          <Button variant="outline" size="sm">Sửa</Button>
         </div>
       </CardContent>
     </Card>
@@ -188,24 +188,24 @@ function ServiceTypeCard({ serviceType }: ServiceTypeCardProps) {
     <Card>
       <CardHeader>
         <CardTitle>{serviceType.name}</CardTitle>
-        <CardDescription>{serviceType.description || "No description"}</CardDescription>
+        <CardDescription>{serviceType.description || "Chưa có mô tả"}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
           <div className="flex justify-between">
-            <span className="font-medium">Price:</span>
+            <span className="font-medium">Giá:</span>
             <span>{formattedPrice}</span>
           </div>
           <div className="flex justify-between">
-            <span className="font-medium">Duration:</span>
-            <span>{serviceType.durationMinutes} minutes</span>
+            <span className="font-medium">Thời gian:</span>
+            <span>{serviceType.durationMinutes} phút</span>
           </div>
           <div className="flex justify-between">
-            <span className="font-medium">Category:</span>
-            <span>{serviceType.category?.name || "Uncategorized"}</span>
+            <span className="font-medium">Danh mục:</span>
+            <span>{serviceType.category?.name || "Chưa phân loại"}</span>
           </div>
           <div className="flex justify-end mt-4">
-            <Button variant="outline" size="sm">Edit</Button>
+            <Button variant="outline" size="sm">Sửa</Button>
           </div>
         </div>
       </CardContent>

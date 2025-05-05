@@ -58,11 +58,11 @@ export default function CustomerList({ searchTerm }: CustomerListProps) {
     return (
       <div className="p-6 flex-1 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-neutral-medium text-xl mb-2">No customers found</div>
+          <div className="text-neutral-medium text-xl mb-2">Không tìm thấy khách hàng</div>
           {searchTerm ? (
-            <p>No results matching your search criteria. Try a different search term.</p>
+            <p>Không có kết quả phù hợp với tìm kiếm của bạn. Hãy thử từ khóa khác.</p>
           ) : (
-            <p>You haven't added any customers yet. Click "Add Customer" to get started.</p>
+            <p>Bạn chưa thêm khách hàng nào. Nhấn "Thêm Khách Hàng" để bắt đầu.</p>
           )}
         </div>
       </div>
@@ -85,7 +85,7 @@ export default function CustomerList({ searchTerm }: CustomerListProps) {
                   <p className="text-neutral-dark text-sm mt-0.5">{formatPhone(customer.phone)}</p>
                 </div>
                 <div className="badge">
-                  {customer.visitCount} visits
+                  {customer.visitCount} lượt
                 </div>
               </div>
               <div className="mt-3 text-sm text-neutral-dark">
@@ -104,12 +104,12 @@ export default function CustomerList({ searchTerm }: CustomerListProps) {
               </div>
               <div className="mt-4 pt-3 border-t border-neutral-light">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-neutral-dark">Last visit:</span>
-                  <span className="font-medium">{customer.lastVisit ? formatDate(customer.lastVisit) : 'Never'}</span>
+                  <span className="text-neutral-dark">Lần ghé gần nhất:</span>
+                  <span className="font-medium">{customer.lastVisit ? formatDate(customer.lastVisit) : 'Chưa từng'}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm mt-1">
-                  <span className="text-neutral-dark">Last service:</span>
-                  <span className="font-medium">{customer.lastService?.serviceName || 'None'}</span>
+                  <span className="text-neutral-dark">Dịch vụ gần nhất:</span>
+                  <span className="font-medium">{customer.lastService?.serviceName || 'Không có'}</span>
                 </div>
               </div>
             </div>

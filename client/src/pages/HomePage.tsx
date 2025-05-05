@@ -16,13 +16,13 @@ export default function HomePage() {
       {/* Header Section */}
       <header className="bg-white p-4 shadow">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Customers</h2>
+          <h2 className="text-xl font-semibold">Khách Hàng</h2>
           <div className="flex items-center space-x-4">
             {/* Search Bar */}
             <div className="relative">
               <input
                 type="text"
-                placeholder="Search by name or phone..."
+                placeholder="Tìm theo tên hoặc số điện thoại..."
                 className="search-input"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -37,7 +37,7 @@ export default function HomePage() {
               onClick={handleAddCustomer}
             >
               <Plus className="h-5 w-5 mr-1" />
-              Add Customer
+              Thêm Khách Hàng
             </button>
           </div>
         </div>
