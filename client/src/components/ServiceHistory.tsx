@@ -1,11 +1,18 @@
 import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { ChevronDown, ChevronUp, Filter, Download } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Loader2, Plus, Edit, Trash, Scissors, Calendar, CircleDollarSign, Image as ImageIcon } from "lucide-react";
+import { format } from "date-fns";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { Service, ServiceImage } from "@shared/schema";
 import { formatDate } from "@/lib/utils";
 import { apiRequest } from "@/lib/queryClient";
-import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Service } from "@shared/schema";
+import ServiceForm from "@/components/ServiceForm";
 
 interface ServiceHistoryProps {
   customerId: number;
@@ -13,131 +20,150 @@ interface ServiceHistoryProps {
 }
 
 export default function ServiceHistory({ customerId, onAddServiceClick }: ServiceHistoryProps) {
+  const [isServiceFormOpen, setIsServiceFormOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const queryClient = useQueryClient();
   const { toast } = useToast();
-  const [expandedServiceIds, setExpandedServiceIds] = useState<number[]>([]);
-  
+
+  // Fetch services for the customer
   const { data: services, isLoading } = useQuery<Service[]>({
     queryKey: [`/api/customers/${customerId}/services`],
   });
-  
-  // Function to toggle service expansion
-  const toggleServiceExpansion = (serviceId: number) => {
-    setExpandedServiceIds(prev => 
-      prev.includes(serviceId)
-        ? prev.filter(id => id !== serviceId)
-        : [...prev, serviceId]
-    );
+
+  // Mutation for deleting a service
+  const deleteServiceMutation = useMutation({
+    mutationFn: async (serviceId: number) => {
+      return apiRequest(`/api/services/${serviceId}`, "DELETE");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/customers/${customerId}/services`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/customers/${customerId}`] });
+      toast({
+        title: "Service deleted",
+        description: "The service has been deleted successfully.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete the service.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleEditService = (service: Service) => {
+    setSelectedService(service);
+    setIsServiceFormOpen(true);
   };
-  
-  const isServiceExpanded = (serviceId: number) => {
-    return expandedServiceIds.includes(serviceId);
+
+  const handleDeleteService = (serviceId: number) => {
+    if (window.confirm("Are you sure you want to delete this service?")) {
+      deleteServiceMutation.mutate(serviceId);
+    }
   };
-  
+
+  const handleCancelEdit = () => {
+    setSelectedService(null);
+    setIsServiceFormOpen(false);
+  };
+
   if (isLoading) {
     return (
-      <div className="card animate-pulse">
-        <div className="card-header">
-          <h3 className="font-semibold h-5 bg-gray-200 rounded w-1/3"></h3>
-        </div>
-        <div className="border-b border-neutral-light h-20 p-4"></div>
-        <div className="border-b border-neutral-light h-20 p-4"></div>
-        <div className="border-b border-neutral-light h-20 p-4"></div>
+      <div className="flex justify-center items-center h-40">
+        <Loader2 className="h-6 w-6 animate-spin" />
       </div>
     );
   }
-  
-  if (!services || services.length === 0) {
-    return (
-      <div className="card">
-        <div className="card-header flex items-center justify-between">
-          <h3 className="font-semibold">Service History</h3>
-          <div className="flex items-center space-x-2">
-            <button className="text-neutral-dark hover:text-[#5C6BC0] p-1" title="Filter">
-              <Filter className="h-5 w-5" />
-            </button>
-            <button className="text-neutral-dark hover:text-[#5C6BC0] p-1" title="Export">
-              <Download className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-        <div className="p-8 text-center">
-          <p className="text-neutral-dark mb-4">No service records found for this customer.</p>
-          <button 
-            className="btn-secondary inline-flex"
-            onClick={onAddServiceClick}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            Add First Service
-          </button>
-        </div>
-      </div>
-    );
-  }
-  
-  return (
-    <div className="card">
-      <div className="card-header flex items-center justify-between">
-        <h3 className="font-semibold">Service History</h3>
-        <div className="flex items-center space-x-2">
-          <button className="text-neutral-dark hover:text-[#5C6BC0] p-1" title="Filter">
-            <Filter className="h-5 w-5" />
-          </button>
-          <button className="text-neutral-dark hover:text-[#5C6BC0] p-1" title="Export">
-            <Download className="h-5 w-5" />
-          </button>
-        </div>
-      </div>
 
-      {services.map((service) => (
-        <div key={service.id} className="border-b border-neutral-light">
-          <div className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <h4 className="font-medium">{service.serviceName}</h4>
-                <div className="flex items-center mt-1 text-sm text-neutral-dark">
-                  <span className="mr-2">{formatDate(service.serviceDate)}</span>
-                  {service.staffName && (
-                    <span className="bg-[#F5F7FA] px-2 py-0.5 rounded">{service.staffName}</span>
-                  )}
-                </div>
-              </div>
-              <button 
-                className="text-neutral-dark hover:text-[#5C6BC0]"
-                onClick={() => toggleServiceExpansion(service.id)}
-              >
-                {isServiceExpanded(service.id) 
-                  ? <ChevronUp className="h-5 w-5" /> 
-                  : <ChevronDown className="h-5 w-5" />
-                }
-              </button>
-            </div>
-            
-            {isServiceExpanded(service.id) && (
-              <div className="mt-3">
-                {service.notes && (
-                  <div className="bg-[#F5F7FA] rounded-lg p-3 text-sm">
-                    <p>{service.notes}</p>
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle>Service History</CardTitle>
+        <Button size="sm" onClick={onAddServiceClick}>
+          <Plus className="h-4 w-4 mr-2" /> Add Service
+        </Button>
+      </CardHeader>
+      <CardContent>
+        {!services || services.length === 0 ? (
+          <div className="text-center py-10 text-gray-500">
+            <Scissors className="h-8 w-8 mx-auto mb-2" />
+            <p>No services recorded yet</p>
+            <Button variant="outline" className="mt-2" onClick={onAddServiceClick}>
+              Record First Service
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {services.map((service) => (
+              <div key={service.id} className="border rounded-lg p-4 relative">
+                <div className="flex justify-between">
+                  <div>
+                    <h3 className="font-semibold text-lg">{service.serviceName}</h3>
+                    <div className="flex items-center text-sm text-gray-500 mt-1">
+                      <Calendar className="h-4 w-4 mr-1" />
+                      <span>{formatDate(service.serviceDate)}</span>
+                    </div>
                   </div>
+                  
+                  <div>
+                    <Badge variant="secondary" className="mb-2">
+                      <CircleDollarSign className="h-3 w-3 mr-1" /> 
+                      {service.price}
+                    </Badge>
+                    
+                    <div className="flex mt-1 space-x-1">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => handleEditService(service)}
+                        className="h-7 w-7"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => handleDeleteService(service.id)}
+                        className="h-7 w-7 text-red-500"
+                      >
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+                
+                {service.notes && (
+                  <>
+                    <Separator className="my-2" />
+                    <p className="text-sm">{service.notes}</p>
+                  </>
                 )}
                 
-                {/* Images would be loaded here */}
                 <ServiceImages serviceId={service.id} />
               </div>
-            )}
+            ))}
           </div>
-        </div>
-      ))}
+        )}
+      </CardContent>
 
-      {services.length > 5 && (
-        <div className="p-4 border-t border-neutral-light text-center">
-          <button className="text-[#5C6BC0] hover:text-[#3F51B5] text-sm font-medium">
-            Load More Services
-          </button>
-        </div>
-      )}
-    </div>
+      {/* Edit Service Dialog */}
+      <Dialog open={isServiceFormOpen} onOpenChange={setIsServiceFormOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Edit Service</DialogTitle>
+          </DialogHeader>
+          {selectedService && (
+            <ServiceForm 
+              customerId={customerId} 
+              service={selectedService} 
+              isEditing={true}
+              onCancel={handleCancelEdit}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+    </Card>
   );
 }
 
@@ -146,24 +172,29 @@ interface ServiceImagesProps {
 }
 
 function ServiceImages({ serviceId }: ServiceImagesProps) {
-  const { data: images, isLoading } = useQuery({
+  // Fetch images for the service
+  const { data: images, isLoading } = useQuery<ServiceImage[]>({
     queryKey: [`/api/services/${serviceId}/images`],
   });
-  
-  if (isLoading) return <div className="mt-3 h-24 bg-gray-100 rounded animate-pulse"></div>;
-  
-  if (!images || images.length === 0) return null;
-  
+
+  if (isLoading || !images || images.length === 0) return null;
+
   return (
-    <div className="mt-3 flex space-x-2">
-      {images.map((image: { id: number, imageUrl: string }, index: number) => (
-        <img 
-          key={image.id}
-          src={image.imageUrl} 
-          alt={`Service image ${index + 1}`} 
-          className="w-24 h-24 object-cover rounded-lg"
-        />
-      ))}
+    <div className="mt-3">
+      <div className="flex items-center text-sm font-medium mb-2">
+        <ImageIcon className="h-4 w-4 mr-1" /> Images
+      </div>
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+        {images.map((image) => (
+          <div key={image.id} className="h-20 w-full rounded-md overflow-hidden">
+            <img
+              src={image.imageUrl}
+              alt="Service"
+              className="h-full w-full object-cover"
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

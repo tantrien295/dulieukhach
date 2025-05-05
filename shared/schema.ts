@@ -19,8 +19,10 @@ export const services = pgTable("services", {
   id: serial("id").primaryKey(),
   customerId: integer("customer_id").references(() => customers.id).notNull(),
   serviceName: text("service_name").notNull(),
+  price: text("price").notNull(),
   notes: text("notes"),
   staffName: text("staff_name"),
+  serviceTypeId: integer("service_type_id").references(() => serviceTypes.id),
   serviceDate: timestamp("service_date").defaultNow().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull()
 });
@@ -118,8 +120,10 @@ export const customerInsertSchema = createInsertSchema(customers, {
 
 export const serviceInsertSchema = createInsertSchema(services, {
   serviceName: (schema) => schema.min(2, "Service name must be at least 2 characters"),
+  price: (schema) => schema.min(1, "Price is required"),
   notes: (schema) => schema.optional(),
   staffName: (schema) => schema.optional(),
+  serviceTypeId: (schema) => schema.optional(),
   serviceDate: (schema) => schema
     .or(z.date())
     .or(z.string().transform(val => val ? new Date(val) : new Date()))

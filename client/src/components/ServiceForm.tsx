@@ -1,19 +1,38 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { X } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
-import { queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
-import { serviceInsertSchema, Service } from "@shared/schema";
-import ImageUpload from "./ImageUpload";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { DatePicker } from "@/components/ui/date-picker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Service, ServiceInsert } from "@shared/schema";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import ImageUpload from "@/components/ImageUpload";
 
-// Extend the schema for form validation
-const serviceFormSchema = serviceInsertSchema.extend({
-  serviceDate: z.string().min(1, "Service date is required"),
-  images: z.array(z.string()).optional(),
+const serviceFormSchema = z.object({
+  serviceName: z.string().min(2, "Service name must be at least 2 characters"),
+  price: z.string().min(1, "Price is required"),
+  notes: z.string().optional(),
+  serviceDate: z.date({ required_error: "Service date is required" }),
+  serviceTypeId: z.string().optional(),
 });
 
 type ServiceFormData = z.infer<typeof serviceFormSchema>;
@@ -28,202 +47,200 @@ interface ServiceFormProps {
 export default function ServiceForm({ 
   customerId, 
   service, 
-  isEditing = false, 
-  onCancel 
+  isEditing = false,
+  onCancel
 }: ServiceFormProps) {
-  const { toast } = useToast();
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
-  
-  // Get staff members for dropdown
-  const { data: staffMembers = [] } = useQuery<{ id: number, name: string, role: string }[]>({
-    queryKey: ["/api/staff"],
-  });
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
-  const defaultValues = isEditing && service
-    ? {
-        ...service,
-        serviceDate: new Date(service.serviceDate).toISOString().split('T')[0],
-        images: []
-      }
-    : {
-        customerId,
-        serviceName: "",
-        staffName: "",
-        serviceDate: new Date().toISOString().split('T')[0],
-        notes: "",
-        images: []
-      };
-
-  const { 
-    register, 
-    handleSubmit, 
-    formState: { errors, isSubmitting },
-    setValue
-  } = useForm<ServiceFormData>({
+  const form = useForm<ServiceFormData>({
     resolver: zodResolver(serviceFormSchema),
-    defaultValues
+    defaultValues: {
+      serviceName: service?.serviceName || "",
+      price: service?.price || "",
+      notes: service?.notes || "",
+      serviceDate: service?.serviceDate ? new Date(service.serviceDate) : new Date(),
+      serviceTypeId: service?.serviceTypeId?.toString() || undefined,
+    },
   });
 
-  const serviceMutation = useMutation({
+  const mutation = useMutation({
     mutationFn: async (data: ServiceFormData) => {
-      // Prepare data for API
-      // Let the schema handle date conversion
-      const serviceData = {
-        customerId: customerId,
+      // Convert data for API
+      const serviceData: ServiceInsert = {
+        customerId,
         serviceName: data.serviceName,
-        staffName: data.staffName || null,
-        serviceDate: data.serviceDate,
-        notes: data.notes || null
+        price: data.price,
+        notes: data.notes || null,
+        serviceDate: data.serviceDate.toISOString(),
+        serviceTypeId: data.serviceTypeId ? parseInt(data.serviceTypeId) : null,
       };
 
-      let serviceId;
       if (isEditing && service) {
-        await apiRequest('PUT', `/api/services/${service.id}`, serviceData);
-        serviceId = service.id;
+        // Update existing service
+        return apiRequest(`/api/services/${service.id}`, "PUT", serviceData);
       } else {
-        const res = await apiRequest('POST', '/api/services', serviceData);
-        const newService = await res.json();
-        serviceId = newService.id;
+        // Create new service
+        return apiRequest("/api/services", "POST", serviceData);
       }
-
-      // Upload images if any
+    },
+    onSuccess: async (data) => {
+      // Handle image uploads if there are any
       if (uploadedImages.length > 0) {
+        const serviceId = isEditing ? service!.id : data.id;
+        
+        // Add each image to the service
         for (const imageUrl of uploadedImages) {
-          await apiRequest('POST', `/api/services/${serviceId}/images`, { imageUrl });
+          await apiRequest(`/api/services/${serviceId}/images`, "POST", { imageUrl });
         }
       }
 
-      return serviceId;
-    },
-    onSuccess: () => {
+      // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: [`/api/customers/${customerId}/services`] });
-      queryClient.invalidateQueries({ queryKey: ['/api/customers'] });
       queryClient.invalidateQueries({ queryKey: [`/api/customers/${customerId}`] });
       
+      // Show success message
       toast({
         title: isEditing ? "Service updated" : "Service added",
         description: isEditing 
-          ? "Service record has been updated successfully." 
-          : "New service has been added successfully.",
+          ? "The service has been updated successfully." 
+          : "The service has been added successfully.",
       });
-      
+
+      // Reset form and close
+      form.reset();
       onCancel();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: `Failed to ${isEditing ? 'update' : 'add'} service: ${error.message}`,
-        variant: "destructive"
+        description: error.message || "An error occurred while saving the service.",
+        variant: "destructive",
       });
-    }
+    },
   });
 
-  const handleImageUpload = (imageUrls: string[]) => {
-    setUploadedImages(imageUrls);
-    setValue('images', imageUrls);
+  const onSubmit = (data: ServiceFormData) => {
+    mutation.mutate(data);
   };
 
-  const onSubmit = (data: ServiceFormData) => {
-    serviceMutation.mutate(data);
+  const onImagesUploaded = (imageUrls: string[]) => {
+    setUploadedImages(imageUrls);
   };
 
   return (
-    <div className="card mt-6">
-      <div className="card-header flex justify-between items-center">
-        <h3 className="font-semibold">{isEditing ? "Edit Service" : "Add New Service"}</h3>
-        <button 
-          onClick={onCancel}
-          className="text-neutral-dark hover:text-[#5C6BC0]"
-        >
-          <X className="h-5 w-5" />
-        </button>
-      </div>
-      <div className="card-content">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Service Type*</label>
-              <select 
-                className={`form-select ${errors.serviceName ? 'border-red-500' : ''}`}
-                {...register("serviceName")}
-              >
-                <option value="">Select a service...</option>
-                <option value="Haircut & Styling">Haircut & Styling</option>
-                <option value="Hair Coloring">Hair Coloring</option>
-                <option value="Highlights/Lowlights">Highlights/Lowlights</option>
-                <option value="Hair Treatment">Hair Treatment</option>
-                <option value="Facial">Facial</option>
-                <option value="Massage">Massage</option>
-                <option value="Manicure">Manicure</option>
-                <option value="Pedicure">Pedicure</option>
-                <option value="Manicure & Pedicure">Manicure & Pedicure</option>
-                <option value="Waxing">Waxing</option>
-                <option value="Other">Other</option>
-              </select>
-              {errors.serviceName && (
-                <p className="text-red-500 text-xs mt-1">{errors.serviceName.message}</p>
-              )}
-            </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="serviceName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Service Name</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-            <div>
-              <label className="block text-sm font-medium mb-1">Service Date*</label>
-              <input 
-                type="date" 
-                className={`form-input ${errors.serviceDate ? 'border-red-500' : ''}`}
-                {...register("serviceDate")}
+        <FormField
+          control={form.control}
+          name="price"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Price</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="0" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="serviceDate"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Service Date</FormLabel>
+              <DatePicker
+                date={field.value}
+                onSelect={field.onChange}
               />
-              {errors.serviceDate && (
-                <p className="text-red-500 text-xs mt-1">{errors.serviceDate.message}</p>
-              )}
-            </div>
-          </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Staff</label>
-            <select 
-              className="form-select"
-              {...register("staffName")}
-            >
-              <option value="">Select staff member...</option>
-              {staffMembers.map((staff) => (
-                <option key={staff.id} value={`${staff.name} (${staff.role})`}>
-                  {staff.name} ({staff.role})
-                </option>
-              ))}
-            </select>
-          </div>
+        <FormField
+          control={form.control}
+          name="serviceTypeId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Service Type</FormLabel>
+              <Select 
+                onValueChange={field.onChange} 
+                defaultValue={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a service type" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="1">Haircut</SelectItem>
+                  <SelectItem value="2">Color</SelectItem>
+                  <SelectItem value="3">Styling</SelectItem>
+                  <SelectItem value="4">Treatment</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Notes</label>
-            <textarea 
-              rows={4} 
-              className="form-textarea"
-              placeholder="Enter detailed notes about the service..."
-              {...register("notes")}
-            ></textarea>
-          </div>
+        <FormField
+          control={form.control}
+          name="notes"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Notes</FormLabel>
+              <FormControl>
+                <Textarea 
+                  {...field} 
+                  placeholder="Additional details about the service..." 
+                  rows={3}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          <ImageUpload onImagesUploaded={handleImageUpload} />
+        <div className="space-y-2">
+          <FormLabel>Service Images</FormLabel>
+          <ImageUpload onImagesUploaded={onImagesUploaded} />
+        </div>
 
-          <div className="flex justify-end space-x-3 mt-6">
-            <button 
-              type="button" 
-              className="btn-outline"
-              onClick={onCancel}
-              disabled={isSubmitting}
-            >
-              Cancel
-            </button>
-            <button 
-              type="submit" 
-              className="btn-primary"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Saving..." : isEditing ? "Update Service" : "Save Service"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className="flex justify-end space-x-2 pt-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+          >
+            Cancel
+          </Button>
+          <Button 
+            type="submit"
+            disabled={mutation.isPending}
+          >
+            {mutation.isPending ? "Saving..." : isEditing ? "Update Service" : "Add Service"}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }
