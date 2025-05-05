@@ -224,10 +224,226 @@ export async function deleteServiceImage(id: number) {
 // Function to get all staff members
 export async function getStaffMembers() {
   const allStaff = await db.query.staffMembers.findMany({
-    orderBy: staffMembers.name
+    orderBy: staffMembers.name,
+    with: {
+      serviceAssignments: {
+        with: {
+          serviceType: {
+            with: {
+              category: true
+            }
+          }
+        }
+      }
+    }
   });
 
   return allStaff;
+}
+
+// Function to get a staff member by ID
+export async function getStaffMemberById(id: number) {
+  const staffMember = await db.query.staffMembers.findFirst({
+    where: eq(staffMembers.id, id),
+    with: {
+      serviceAssignments: {
+        with: {
+          serviceType: {
+            with: {
+              category: true
+            }
+          }
+        }
+      }
+    }
+  });
+
+  return staffMember;
+}
+
+// Function to create a staff member
+export async function createStaffMember(staffData: StaffMemberInsert) {
+  const [newStaff] = await db.insert(staffMembers).values(staffData).returning();
+  return newStaff;
+}
+
+// Function to update a staff member
+export async function updateStaffMember(id: number, staffData: StaffMemberInsert) {
+  const [updatedStaff] = await db
+    .update(staffMembers)
+    .set(staffData)
+    .where(eq(staffMembers.id, id))
+    .returning();
+  
+  return updatedStaff || null;
+}
+
+// Function to delete a staff member
+export async function deleteStaffMember(id: number) {
+  // First delete all service assignments
+  await db.delete(staffServiceAssignments).where(eq(staffServiceAssignments.staffId, id));
+  
+  // Then delete the staff member
+  const [deletedStaff] = await db
+    .delete(staffMembers)
+    .where(eq(staffMembers.id, id))
+    .returning();
+  
+  return !!deletedStaff;
+}
+
+// Function to get all service categories
+export async function getServiceCategories() {
+  const categories = await db.query.serviceCategories.findMany({
+    orderBy: serviceCategories.name,
+    with: {
+      serviceTypes: true
+    }
+  });
+
+  return categories;
+}
+
+// Function to get a service category by ID
+export async function getServiceCategoryById(id: number) {
+  const category = await db.query.serviceCategories.findFirst({
+    where: eq(serviceCategories.id, id),
+    with: {
+      serviceTypes: true
+    }
+  });
+
+  return category;
+}
+
+// Function to create a service category
+export async function createServiceCategory(categoryData: ServiceCategoryInsert) {
+  const [newCategory] = await db.insert(serviceCategories).values(categoryData).returning();
+  return newCategory;
+}
+
+// Function to update a service category
+export async function updateServiceCategory(id: number, categoryData: ServiceCategoryInsert) {
+  const [updatedCategory] = await db
+    .update(serviceCategories)
+    .set(categoryData)
+    .where(eq(serviceCategories.id, id))
+    .returning();
+  
+  return updatedCategory || null;
+}
+
+// Function to delete a service category
+export async function deleteServiceCategory(id: number) {
+  // Check if there are service types using this category
+  const serviceTypeCount = await db
+    .select({ count: count() })
+    .from(serviceTypes)
+    .where(eq(serviceTypes.categoryId, id));
+  
+  if (serviceTypeCount[0]?.count > 0) {
+    throw new Error("Cannot delete category that has service types");
+  }
+  
+  const [deletedCategory] = await db
+    .delete(serviceCategories)
+    .where(eq(serviceCategories.id, id))
+    .returning();
+  
+  return !!deletedCategory;
+}
+
+// Function to get all service types
+export async function getServiceTypes() {
+  const types = await db.query.serviceTypes.findMany({
+    orderBy: serviceTypes.name,
+    with: {
+      category: true
+    }
+  });
+
+  return types;
+}
+
+// Function to get a service type by ID
+export async function getServiceTypeById(id: number) {
+  const type = await db.query.serviceTypes.findFirst({
+    where: eq(serviceTypes.id, id),
+    with: {
+      category: true
+    }
+  });
+
+  return type;
+}
+
+// Function to create a service type
+export async function createServiceType(typeData: ServiceTypeInsert) {
+  const [newType] = await db.insert(serviceTypes).values(typeData).returning();
+  return newType;
+}
+
+// Function to update a service type
+export async function updateServiceType(id: number, typeData: ServiceTypeInsert) {
+  const [updatedType] = await db
+    .update(serviceTypes)
+    .set(typeData)
+    .where(eq(serviceTypes.id, id))
+    .returning();
+  
+  return updatedType || null;
+}
+
+// Function to delete a service type
+export async function deleteServiceType(id: number) {
+  // Check if there are service assignments using this type
+  const assignmentCount = await db
+    .select({ count: count() })
+    .from(staffServiceAssignments)
+    .where(eq(staffServiceAssignments.serviceTypeId, id));
+  
+  if (assignmentCount[0]?.count > 0) {
+    throw new Error("Cannot delete service type that has staff assignments");
+  }
+  
+  const [deletedType] = await db
+    .delete(serviceTypes)
+    .where(eq(serviceTypes.id, id))
+    .returning();
+  
+  return !!deletedType;
+}
+
+// Function to assign a service type to a staff member
+export async function assignServiceToStaff(staffId: number, serviceTypeId: number) {
+  // Check if assignment already exists
+  const existingAssignment = await db.query.staffServiceAssignments.findFirst({
+    where: and(
+      eq(staffServiceAssignments.staffId, staffId),
+      eq(staffServiceAssignments.serviceTypeId, serviceTypeId)
+    )
+  });
+
+  if (existingAssignment) {
+    return existingAssignment;
+  }
+  
+  const [newAssignment] = await db
+    .insert(staffServiceAssignments)
+    .values({ staffId, serviceTypeId })
+    .returning();
+  
+  return newAssignment;
+}
+
+// Function to remove a service assignment from a staff member
+export async function removeServiceFromStaff(assignmentId: number) {
+  const [deletedAssignment] = await db
+    .delete(staffServiceAssignments)
+    .where(eq(staffServiceAssignments.id, assignmentId))
+    .returning();
+  
+  return !!deletedAssignment;
 }
 
 export const storage = {
@@ -244,5 +460,29 @@ export const storage = {
   getServiceImages,
   addServiceImage,
   deleteServiceImage,
-  getStaffMembers
+  
+  // Staff-related functions
+  getStaffMembers,
+  getStaffMemberById,
+  createStaffMember,
+  updateStaffMember,
+  deleteStaffMember,
+  
+  // Service categories
+  getServiceCategories,
+  getServiceCategoryById,
+  createServiceCategory,
+  updateServiceCategory,
+  deleteServiceCategory,
+  
+  // Service types
+  getServiceTypes,
+  getServiceTypeById,
+  createServiceType,
+  updateServiceType,
+  deleteServiceType,
+  
+  // Service assignments
+  assignServiceToStaff,
+  removeServiceFromStaff
 };

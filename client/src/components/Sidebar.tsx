@@ -27,43 +27,33 @@ export default function Sidebar() {
       <nav className="p-2">
         <ul>
           <li className="mb-1">
-            <Link href="/">
-              <a className={isActive("/") ? "nav-link-active" : "nav-link"}>
+            <Link href="/" className={isActive("/") ? "nav-link-active" : "nav-link"}>
                 <UserCircle className="h-5 w-5 mr-3" />
                 Customers
-              </a>
             </Link>
           </li>
           <li className="mb-1">
-            <Link href="/services">
-              <a className={isActive("/services") ? "nav-link-active" : "nav-link"}>
+            <Link href="/services" className={isActive("/services") ? "nav-link-active" : "nav-link"}>
                 <Scissors className="h-5 w-5 mr-3" />
                 Services
-              </a>
             </Link>
           </li>
           <li className="mb-1">
-            <Link href="/staff">
-              <a className={isActive("/staff") ? "nav-link-active" : "nav-link"}>
+            <Link href="/staff" className={isActive("/staff") ? "nav-link-active" : "nav-link"}>
                 <Users className="h-5 w-5 mr-3" />
                 Staff
-              </a>
             </Link>
           </li>
           <li className="mb-1">
-            <Link href="/reports">
-              <a className={isActive("/reports") ? "nav-link-active" : "nav-link"}>
+            <Link href="/reports" className={isActive("/reports") ? "nav-link-active" : "nav-link"}>
                 <BarChart3 className="h-5 w-5 mr-3" />
                 Reports
-              </a>
             </Link>
           </li>
           <li className="mb-1">
-            <Link href="/settings">
-              <a className={isActive("/settings") ? "nav-link-active" : "nav-link"}>
+            <Link href="/settings" className={isActive("/settings") ? "nav-link-active" : "nav-link"}>
                 <Settings className="h-5 w-5 mr-3" />
                 Settings
-              </a>
             </Link>
           </li>
         </ul>

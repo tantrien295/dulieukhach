@@ -2,7 +2,13 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
-import { customerInsertSchema, serviceInsertSchema } from "@shared/schema";
+import { 
+  customerInsertSchema, 
+  serviceInsertSchema,
+  staffMemberInsertSchema,
+  serviceCategoryInsertSchema,
+  serviceTypeInsertSchema
+} from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // All routes prefixed with /api
@@ -245,6 +251,299 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.json(staff);
     } catch (error) {
       console.error('Error fetching staff members:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.get('/api/staff/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid staff ID' });
+      }
+
+      const staffMember = await storage.getStaffMemberById(id);
+      if (!staffMember) {
+        return res.status(404).json({ error: 'Staff member not found' });
+      }
+
+      return res.json(staffMember);
+    } catch (error) {
+      console.error('Error fetching staff member:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.post('/api/staff', async (req, res) => {
+    try {
+      const validatedData = staffMemberInsertSchema.parse(req.body);
+      const newStaff = await storage.createStaffMember(validatedData);
+      return res.status(201).json(newStaff);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ errors: error.errors });
+      }
+      console.error('Error creating staff member:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.put('/api/staff/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid staff ID' });
+      }
+
+      const validatedData = staffMemberInsertSchema.parse(req.body);
+      const updatedStaff = await storage.updateStaffMember(id, validatedData);
+      
+      if (!updatedStaff) {
+        return res.status(404).json({ error: 'Staff member not found' });
+      }
+
+      return res.json(updatedStaff);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ errors: error.errors });
+      }
+      console.error('Error updating staff member:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.delete('/api/staff/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid staff ID' });
+      }
+
+      const deleted = await storage.deleteStaffMember(id);
+      if (!deleted) {
+        return res.status(404).json({ error: 'Staff member not found' });
+      }
+
+      return res.status(204).end();
+    } catch (error) {
+      console.error('Error deleting staff member:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // Service categories routes
+  app.get('/api/service-categories', async (req, res) => {
+    try {
+      const categories = await storage.getServiceCategories();
+      return res.json(categories);
+    } catch (error) {
+      console.error('Error fetching service categories:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.get('/api/service-categories/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid category ID' });
+      }
+
+      const category = await storage.getServiceCategoryById(id);
+      if (!category) {
+        return res.status(404).json({ error: 'Service category not found' });
+      }
+
+      return res.json(category);
+    } catch (error) {
+      console.error('Error fetching service category:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.post('/api/service-categories', async (req, res) => {
+    try {
+      const validatedData = serviceCategoryInsertSchema.parse(req.body);
+      const newCategory = await storage.createServiceCategory(validatedData);
+      return res.status(201).json(newCategory);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ errors: error.errors });
+      }
+      console.error('Error creating service category:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.put('/api/service-categories/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid category ID' });
+      }
+
+      const validatedData = serviceCategoryInsertSchema.parse(req.body);
+      const updatedCategory = await storage.updateServiceCategory(id, validatedData);
+      
+      if (!updatedCategory) {
+        return res.status(404).json({ error: 'Service category not found' });
+      }
+
+      return res.json(updatedCategory);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ errors: error.errors });
+      }
+      console.error('Error updating service category:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.delete('/api/service-categories/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid category ID' });
+      }
+
+      try {
+        const deleted = await storage.deleteServiceCategory(id);
+        if (!deleted) {
+          return res.status(404).json({ error: 'Service category not found' });
+        }
+        return res.status(204).end();
+      } catch (deleteError) {
+        return res.status(400).json({ error: deleteError.message });
+      }
+    } catch (error) {
+      console.error('Error deleting service category:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // Service types routes
+  app.get('/api/service-types', async (req, res) => {
+    try {
+      const types = await storage.getServiceTypes();
+      return res.json(types);
+    } catch (error) {
+      console.error('Error fetching service types:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.get('/api/service-types/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid service type ID' });
+      }
+
+      const serviceType = await storage.getServiceTypeById(id);
+      if (!serviceType) {
+        return res.status(404).json({ error: 'Service type not found' });
+      }
+
+      return res.json(serviceType);
+    } catch (error) {
+      console.error('Error fetching service type:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.post('/api/service-types', async (req, res) => {
+    try {
+      const validatedData = serviceTypeInsertSchema.parse(req.body);
+      const newType = await storage.createServiceType(validatedData);
+      return res.status(201).json(newType);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ errors: error.errors });
+      }
+      console.error('Error creating service type:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.put('/api/service-types/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid service type ID' });
+      }
+
+      const validatedData = serviceTypeInsertSchema.parse(req.body);
+      const updatedType = await storage.updateServiceType(id, validatedData);
+      
+      if (!updatedType) {
+        return res.status(404).json({ error: 'Service type not found' });
+      }
+
+      return res.json(updatedType);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ errors: error.errors });
+      }
+      console.error('Error updating service type:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.delete('/api/service-types/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid service type ID' });
+      }
+
+      try {
+        const deleted = await storage.deleteServiceType(id);
+        if (!deleted) {
+          return res.status(404).json({ error: 'Service type not found' });
+        }
+        return res.status(204).end();
+      } catch (deleteError) {
+        return res.status(400).json({ error: deleteError.message });
+      }
+    } catch (error) {
+      console.error('Error deleting service type:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // Staff service assignments routes
+  app.post('/api/staff/:staffId/services/:serviceTypeId', async (req, res) => {
+    try {
+      const staffId = parseInt(req.params.staffId);
+      const serviceTypeId = parseInt(req.params.serviceTypeId);
+      
+      if (isNaN(staffId) || isNaN(serviceTypeId)) {
+        return res.status(400).json({ error: 'Invalid staff ID or service type ID' });
+      }
+
+      const assignment = await storage.assignServiceToStaff(staffId, serviceTypeId);
+      return res.status(201).json(assignment);
+    } catch (error) {
+      console.error('Error assigning service to staff:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.delete('/api/staff/assignments/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid assignment ID' });
+      }
+
+      const deleted = await storage.removeServiceFromStaff(id);
+      if (!deleted) {
+        return res.status(404).json({ error: 'Assignment not found' });
+      }
+
+      return res.status(204).end();
+    } catch (error) {
+      console.error('Error removing service assignment:', error);
       return res.status(500).json({ error: 'Internal server error' });
     }
   });
