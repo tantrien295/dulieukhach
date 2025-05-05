@@ -97,6 +97,7 @@ export default function CustomerForm({ customer, isEditing = false }: CustomerFo
       if (cityStateZip) addressParts.push(cityStateZip);
       
       // Prepare data for API
+      // Let the schema handle date conversion
       const customerData: CustomerInsert = {
         name: data.name,
         phone: data.phone,

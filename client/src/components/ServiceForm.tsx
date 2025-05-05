@@ -35,7 +35,7 @@ export default function ServiceForm({
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   
   // Get staff members for dropdown
-  const { data: staffMembers } = useQuery({
+  const { data: staffMembers = [] } = useQuery<{ id: number, name: string, role: string }[]>({
     queryKey: ["/api/staff"],
   });
 
@@ -67,11 +67,12 @@ export default function ServiceForm({
   const serviceMutation = useMutation({
     mutationFn: async (data: ServiceFormData) => {
       // Prepare data for API
+      // Convert string date to Date object for the API
       const serviceData = {
         customerId: customerId,
         serviceName: data.serviceName,
         staffName: data.staffName || null,
-        serviceDate: data.serviceDate,
+        serviceDate: new Date(data.serviceDate),
         notes: data.notes || null
       };
 
@@ -184,18 +185,7 @@ export default function ServiceForm({
               {...register("staffName")}
             >
               <option value="">Select staff member...</option>
-              {staffMembers?.map((staff: { id: number, name: string, role: string }) => (
-                <option key={staff.id} value={`${staff.name} (${staff.role})`}>
-                  {staff.name} ({staff.role})
-                </option>
-              ))}
-              {!staffMembers && [
-                { id: 1, name: "Jennifer", role: "Stylist" },
-                { id: 2, name: "Michael", role: "Stylist" },
-                { id: 3, name: "Ashley", role: "Colorist" },
-                { id: 4, name: "David", role: "Massage Therapist" },
-                { id: 5, name: "Maria", role: "Esthetician" }
-              ].map((staff) => (
+              {staffMembers.map((staff) => (
                 <option key={staff.id} value={`${staff.name} (${staff.role})`}>
                   {staff.name} ({staff.role})
                 </option>
