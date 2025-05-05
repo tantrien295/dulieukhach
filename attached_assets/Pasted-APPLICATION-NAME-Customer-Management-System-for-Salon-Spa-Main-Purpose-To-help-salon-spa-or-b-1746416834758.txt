@@ -1,0 +1,81 @@
+APPLICATION NAME: Customer Management System for Salon/Spa
+🎯 Main Purpose:
+To help salon, spa, or beauty clinic owners store, track, and manage customer information and service history in a simple and efficient way.
+
+🧱 TECHNOLOGIES USED:
+React (v18+) – main frontend library.
+
+TypeScript – ensures type safety and better maintainability.
+
+Plain CSS – no Tailwind or MUI (as requested).
+
+ReactDOM.createRoot – modern React rendering API.
+
+create-react-app – for quick project setup.
+
+🔍 KEY FEATURES:
+1. Customer Information Management
+Stores full name, phone number, birthdate, and address.
+
+Quick customer search by name or phone number.
+
+Clear and concise customer list view.
+
+Each customer has a detailed page with personal info and service history.
+
+2. Customer Service History Tracking
+Records each service session for a customer:
+
+Service name
+
+Detailed notes
+
+Staff who performed the service
+
+Service date
+
+Service images (before/after or result photos)
+
+Supports adding multiple service records per customer.
+
+Images are displayed for visual reference.
+
+3. User Interface
+Simple and intuitive layout.
+
+Focused on fast operations: quickly add customers and services.
+
+Logical layout: clear separation of customer data and services.
+
+Service table: compact "Staff" column and expanded "Notes" area.
+
+📦 PROJECT STRUCTURE:
+plaintext
+Sao chép
+Chỉnh sửa
+src/
+│
+├── components/
+│   ├── CustomerList.tsx       # Customer list with search
+│   ├── CustomerForm.tsx       # Form to add/edit customers
+│   ├── ServiceHistory.tsx     # Customer service records
+│   ├── ServiceForm.tsx        # Form to add new services
+│   └── ImageUpload.tsx        # Upload and display images
+│
+├── pages/
+│   ├── HomePage.tsx
+│   └── CustomerDetailPage.tsx
+│
+├── App.tsx
+├── index.tsx
+└── styles/
+    └── App.css                # Styled using regular CSS
+⚙️ Technical Highlights:
+Uses react-dom/client for React 18 compatibility.
+
+TypeScript in strict mode for code quality.
+
+Easy to extend: can add features like data export, filtering by date, or service categories.
+
+Ready to deploy: built using react-scripts.
+
