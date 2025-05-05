@@ -5,7 +5,7 @@ import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Service, ServiceImage } from "@shared/schema";
@@ -204,7 +204,11 @@ function ServiceImages({ serviceId }: ServiceImagesProps) {
 
       {/* Modal xem hình ảnh lớn */}
       <Dialog open={!!selectedImage} onOpenChange={(open) => !open && setSelectedImage(null)}>
-        <DialogContent className="sm:max-w-[85vw] h-auto max-h-[85vh] p-0 bg-transparent border-none shadow-none">
+        <DialogContent className="sm:max-w-[85vw] h-auto max-h-[85vh] p-0 overflow-hidden bg-black/5 backdrop-blur-sm shadow-xl border border-white/20">
+          <DialogHeader>
+            <DialogTitle className="sr-only">Xem hình ảnh dịch vụ</DialogTitle>
+            <DialogDescription className="sr-only">Nhấp vào nút đóng hoặc bên ngoài để đóng hình ảnh</DialogDescription>
+          </DialogHeader>
           <div className="relative">
             <Button 
               variant="ghost" 
