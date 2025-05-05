@@ -47,7 +47,7 @@ export default function ReportsPage() {
   });
 
   if (isLoading) {
-    return <div className="container mx-auto py-6 text-center">Loading reports data...</div>;
+    return <div className="container mx-auto py-6 text-center">Đang tải dữ liệu báo cáo...</div>;
   }
 
   // Process data for charts
@@ -104,31 +104,31 @@ export default function ReportsPage() {
   
   return (
     <div className="container mx-auto py-6">
-      <h1 className="text-3xl font-bold mb-4">Reports & Analytics</h1>
+      <h1 className="text-3xl font-bold mb-4">Báo Cáo & Phân Tích</h1>
       
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-4">
           <Select value={timeFrame} onValueChange={setTimeFrame}>
             <SelectTrigger className="w-32">
-              <SelectValue placeholder="Time" />
+              <SelectValue placeholder="Thời gian" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="week">Week</SelectItem>
-              <SelectItem value="month">Month</SelectItem>
-              <SelectItem value="quarter">Quarter</SelectItem>
-              <SelectItem value="year">Year</SelectItem>
+              <SelectItem value="week">Tuần</SelectItem>
+              <SelectItem value="month">Tháng</SelectItem>
+              <SelectItem value="quarter">Quý</SelectItem>
+              <SelectItem value="year">Năm</SelectItem>
             </SelectContent>
           </Select>
           
           <Select value={serviceType} onValueChange={setServiceType}>
             <SelectTrigger className="w-40">
-              <SelectValue placeholder="Service Type" />
+              <SelectValue placeholder="Loại dịch vụ" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Services</SelectItem>
-              <SelectItem value="hair">Hair</SelectItem>
-              <SelectItem value="nails">Nails</SelectItem>
-              <SelectItem value="facial">Facial</SelectItem>
+              <SelectItem value="all">Tất cả dịch vụ</SelectItem>
+              <SelectItem value="hair">Tóc</SelectItem>
+              <SelectItem value="nails">Móng</SelectItem>
+              <SelectItem value="facial">Chăm sóc da</SelectItem>
               <SelectItem value="massage">Massage</SelectItem>
             </SelectContent>
           </Select>
@@ -138,7 +138,7 @@ export default function ReportsPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <CardTitle className="text-sm font-medium">Tổng Doanh Thu</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -147,23 +147,23 @@ export default function ReportsPage() {
                 currency: 'VND'
               }).format(totalRevenue)}
             </div>
-            <p className="text-xs text-gray-500 mt-1">+2.5% from last month</p>
+            <p className="text-xs text-gray-500 mt-1">+2.5% so với tháng trước</p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Services Performed</CardTitle>
+            <CardTitle className="text-sm font-medium">Số Dịch Vụ Đã Thực Hiện</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalServices}</div>
-            <p className="text-xs text-gray-500 mt-1">+12% from last month</p>
+            <p className="text-xs text-gray-500 mt-1">+12% so với tháng trước</p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Avg. Service Price</CardTitle>
+            <CardTitle className="text-sm font-medium">Giá Dịch Vụ Trung Bình</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -172,24 +172,24 @@ export default function ReportsPage() {
                 currency: 'VND'
               }).format(averageServicePrice)}
             </div>
-            <p className="text-xs text-gray-500 mt-1">-1.2% from last month</p>
+            <p className="text-xs text-gray-500 mt-1">-1.2% so với tháng trước</p>
           </CardContent>
         </Card>
       </div>
       
       <Tabs defaultValue="revenue">
         <TabsList className="mb-4">
-          <TabsTrigger value="revenue">Revenue</TabsTrigger>
-          <TabsTrigger value="services">Services</TabsTrigger>
-          <TabsTrigger value="customers">Customers</TabsTrigger>
+          <TabsTrigger value="revenue">Doanh Thu</TabsTrigger>
+          <TabsTrigger value="services">Dịch Vụ</TabsTrigger>
+          <TabsTrigger value="customers">Khách Hàng</TabsTrigger>
         </TabsList>
         
         <TabsContent value="revenue">
           <Card>
             <CardHeader>
-              <CardTitle>Revenue Trends</CardTitle>
+              <CardTitle>Xu Hướng Doanh Thu</CardTitle>
               <CardDescription>
-                View revenue performance over time
+                Xem hiệu suất doanh thu theo thời gian
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -213,7 +213,7 @@ export default function ReportsPage() {
                           style: 'currency',
                           currency: 'VND'
                         }).format(Number(value)),
-                        "Revenue"
+                        "Doanh Thu"
                       ]}
                     />
                     <Legend />
@@ -228,9 +228,9 @@ export default function ReportsPage() {
         <TabsContent value="services">
           <Card>
             <CardHeader>
-              <CardTitle>Services Distribution</CardTitle>
+              <CardTitle>Phân Bổ Dịch Vụ</CardTitle>
               <CardDescription>
-                Breakdown of services by type
+                Thống kê dịch vụ theo loại
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col md:flex-row items-center">
@@ -273,7 +273,7 @@ export default function ReportsPage() {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="count" name="Services Count" fill="#82ca9d" />
+                    <Bar dataKey="count" name="Số Lượng Dịch Vụ" fill="#82ca9d" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -284,14 +284,14 @@ export default function ReportsPage() {
         <TabsContent value="customers">
           <Card>
             <CardHeader>
-              <CardTitle>Customer Metrics</CardTitle>
+              <CardTitle>Thống Kê Khách Hàng</CardTitle>
               <CardDescription>
-                Customer acquisition and retention
+                Tỷ lệ giữ chân và thu hút khách hàng
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="h-80 flex items-center justify-center">
-                <p className="text-muted-foreground">Customer metrics are in development</p>
+                <p className="text-muted-foreground">Thống kê khách hàng đang được phát triển</p>
               </div>
             </CardContent>
           </Card>
