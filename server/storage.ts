@@ -127,9 +127,20 @@ export async function createCustomer(customerData: CustomerInsert) {
       // Chuyển đổi Date thành string nếu cần
       birthdate: customerData.birthdate instanceof Date 
         ? customerData.birthdate.toISOString() 
-        : customerData.birthdate
+        : customerData.birthdate,
+      // Đảm bảo các trường không bắt buộc có giá trị phù hợp
+      address: customerData.address || null,
+      notes: customerData.notes || null
     };
     
+    // Loại bỏ các trường undefined trước khi insert
+    Object.keys(sanitizedData).forEach(key => {
+      if (sanitizedData[key] === undefined) {
+        delete sanitizedData[key];
+      }
+    });
+    
+    console.log("Sanitized data before insert:", JSON.stringify(sanitizedData));
     const [newCustomer] = await db.insert(customers).values(sanitizedData).returning();
     return newCustomer;
   } catch (error) {
