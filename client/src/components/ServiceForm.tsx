@@ -137,7 +137,7 @@ export default function ServiceForm({
           name="serviceName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Service Name</FormLabel>
+              <FormLabel>Tên Dịch Vụ</FormLabel>
               <FormControl>
                 <Input {...field} />
               </FormControl>
@@ -151,7 +151,7 @@ export default function ServiceForm({
           name="price"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Price</FormLabel>
+              <FormLabel>Giá Tiền</FormLabel>
               <FormControl>
                 <Input {...field} placeholder="0" />
               </FormControl>
@@ -165,7 +165,7 @@ export default function ServiceForm({
           name="serviceDate"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Service Date</FormLabel>
+              <FormLabel>Ngày Thực Hiện</FormLabel>
               <DatePicker
                 date={field.value}
                 onSelect={field.onChange}
@@ -180,21 +180,21 @@ export default function ServiceForm({
           name="serviceTypeId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Service Type</FormLabel>
+              <FormLabel>Loại Dịch Vụ</FormLabel>
               <Select 
                 onValueChange={field.onChange} 
                 defaultValue={field.value}
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a service type" />
+                    <SelectValue placeholder="Chọn loại dịch vụ" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="1">Haircut</SelectItem>
-                  <SelectItem value="2">Color</SelectItem>
-                  <SelectItem value="3">Styling</SelectItem>
-                  <SelectItem value="4">Treatment</SelectItem>
+                  <SelectItem value="1">Cắt Tóc</SelectItem>
+                  <SelectItem value="2">Nhuộm Màu</SelectItem>
+                  <SelectItem value="3">Tạo Kiểu</SelectItem>
+                  <SelectItem value="4">Chăm Sóc</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -207,11 +207,11 @@ export default function ServiceForm({
           name="notes"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Notes</FormLabel>
+              <FormLabel>Ghi Chú</FormLabel>
               <FormControl>
                 <Textarea 
                   {...field} 
-                  placeholder="Additional details about the service..." 
+                  placeholder="Thông tin chi tiết về dịch vụ..." 
                   rows={3}
                 />
               </FormControl>
@@ -221,7 +221,7 @@ export default function ServiceForm({
         />
 
         <div className="space-y-2">
-          <FormLabel>Service Images</FormLabel>
+          <FormLabel>Hình Ảnh Dịch Vụ</FormLabel>
           <ImageUpload onImagesUploaded={onImagesUploaded} />
         </div>
 
@@ -231,13 +231,13 @@ export default function ServiceForm({
             variant="outline"
             onClick={onCancel}
           >
-            Cancel
+            Hủy
           </Button>
           <Button 
             type="submit"
             disabled={mutation.isPending}
           >
-            {mutation.isPending ? "Saving..." : isEditing ? "Update Service" : "Add Service"}
+            {mutation.isPending ? "Đang Lưu..." : isEditing ? "Cập Nhật Dịch Vụ" : "Thêm Dịch Vụ"}
           </Button>
         </div>
       </form>
