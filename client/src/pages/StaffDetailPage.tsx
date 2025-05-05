@@ -148,7 +148,7 @@ export default function StaffDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
-        <h1 className="text-3xl font-bold">Staff Profile</h1>
+        <h1 className="text-3xl font-bold">Hồ Sơ Nhân Viên</h1>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -160,9 +160,9 @@ export default function StaffDetailPage() {
                 <AvatarFallback>{staffMember.name.charAt(0)}</AvatarFallback>
               </Avatar>
               <CardTitle className="mt-2">{staffMember.name}</CardTitle>
-              <CardDescription>
+              <div className="mt-1">
                 <Badge>{staffMember.role}</Badge>
-              </CardDescription>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -180,12 +180,12 @@ export default function StaffDetailPage() {
                 )}
                 <div className="flex items-center">
                   <Calendar className="h-4 w-4 mr-2 text-gray-500" />
-                  <span>Joined {new Date(staffMember.createdAt).toLocaleDateString()}</span>
+                  <span>Ngày tham gia: {new Date(staffMember.createdAt).toLocaleDateString()}</span>
                 </div>
                 <div className="flex justify-center mt-4">
                   <Button variant="outline">
                     <Edit className="h-4 w-4 mr-2" />
-                    Edit Profile
+                    Sửa Hồ Sơ
                   </Button>
                 </div>
               </div>
@@ -195,7 +195,7 @@ export default function StaffDetailPage() {
           {staffMember.notes && (
             <Card className="mt-6">
               <CardHeader>
-                <CardTitle className="text-lg">Notes</CardTitle>
+                <CardTitle className="text-lg">Ghi Chú</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm">{staffMember.notes}</p>
@@ -207,23 +207,23 @@ export default function StaffDetailPage() {
         <div className="col-span-2">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Services</CardTitle>
+              <CardTitle>Dịch Vụ</CardTitle>
               <Button size="sm" onClick={() => setIsServiceAssignDialogOpen(true)}>
                 <Plus className="h-4 w-4 mr-2" />
-                Assign Service
+                Gán Dịch Vụ
               </Button>
             </CardHeader>
             <CardContent>
               {!staffMember.serviceAssignments || staffMember.serviceAssignments.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <Scissors className="h-8 w-8 mx-auto mb-2" />
-                  <p>No services assigned yet</p>
+                  <p>Chưa có dịch vụ nào được gán</p>
                   <Button 
                     variant="outline" 
                     className="mt-2" 
                     onClick={() => setIsServiceAssignDialogOpen(true)}
                   >
-                    Assign First Service
+                    Gán Dịch Vụ Đầu Tiên
                   </Button>
                 </div>
               ) : (
@@ -234,7 +234,7 @@ export default function StaffDetailPage() {
                         <h3 className="font-medium">{assignment.serviceType?.name}</h3>
                         <div className="flex text-sm text-gray-500 mt-1">
                           <Badge variant="outline" className="mr-2">
-                            {assignment.serviceType?.category?.name || "Uncategorized"}
+                            {assignment.serviceType?.category?.name || "Chưa phân loại"}
                           </Badge>
                           <span className="mr-2">
                             {typeof assignment.serviceType?.price === 'string' 
@@ -245,7 +245,7 @@ export default function StaffDetailPage() {
                                 }).format(Number(assignment.serviceType.price)) : ''}
                           </span>
                           <span>
-                            {assignment.serviceType?.durationMinutes} min
+                            {assignment.serviceType?.durationMinutes} phút
                           </span>
                         </div>
                       </div>
