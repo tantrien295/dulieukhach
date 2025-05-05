@@ -120,19 +120,47 @@ export async function getCustomerSummary(id: number) {
 
 // Function to create a new customer
 export async function createCustomer(customerData: CustomerInsert) {
-  const [newCustomer] = await db.insert(customers).values(customerData).returning();
-  return newCustomer;
+  try {
+    // Đảm bảo dữ liệu ngày tháng được xử lý đúng
+    const sanitizedData = {
+      ...customerData,
+      // Chuyển đổi Date thành string nếu cần
+      birthdate: customerData.birthdate instanceof Date 
+        ? customerData.birthdate.toISOString() 
+        : customerData.birthdate
+    };
+    
+    const [newCustomer] = await db.insert(customers).values(sanitizedData).returning();
+    return newCustomer;
+  } catch (error) {
+    console.error("Error in createCustomer:", error);
+    throw error;
+  }
 }
 
 // Function to update a customer
 export async function updateCustomer(id: number, customerData: CustomerInsert) {
-  const [updatedCustomer] = await db
-    .update(customers)
-    .set(customerData)
-    .where(eq(customers.id, id))
-    .returning();
-  
-  return updatedCustomer || null;
+  try {
+    // Đảm bảo dữ liệu ngày tháng được xử lý đúng
+    const sanitizedData = {
+      ...customerData,
+      // Chuyển đổi Date thành string nếu cần
+      birthdate: customerData.birthdate instanceof Date 
+        ? customerData.birthdate.toISOString() 
+        : customerData.birthdate
+    };
+    
+    const [updatedCustomer] = await db
+      .update(customers)
+      .set(sanitizedData)
+      .where(eq(customers.id, id))
+      .returning();
+    
+    return updatedCustomer || null;
+  } catch (error) {
+    console.error("Error in updateCustomer:", error);
+    throw error;
+  }
 }
 
 // Function to delete a customer
