@@ -110,8 +110,7 @@ export default function CustomerForm({ customer, isEditing = false }: CustomerFo
         await apiRequest('PUT', `/api/customers/${customer.id}`, customerData);
         return customer.id;
       } else {
-        const res = await apiRequest('POST', '/api/customers', customerData);
-        const newCustomer = await res.json();
+        const newCustomer = await apiRequest('POST', '/api/customers', customerData);
         return newCustomer.id;
       }
     },
