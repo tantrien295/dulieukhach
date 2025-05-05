@@ -1,12 +1,19 @@
 import { db } from "@db";
-import { eq, desc, count, sql, and } from "drizzle-orm";
+import { eq, desc, count, sql, and, isNull, isNotNull } from "drizzle-orm";
 import { 
   customers, 
   services, 
   serviceImages, 
   staffMembers,
+  serviceCategories,
+  serviceTypes,
+  staffServiceAssignments,
   CustomerInsert,
-  ServiceInsert
+  ServiceInsert,
+  ServiceCategoryInsert,
+  ServiceTypeInsert,
+  StaffMemberInsert,
+  StaffServiceAssignmentInsert
 } from "@shared/schema";
 
 // Function to get all customers with summary info
