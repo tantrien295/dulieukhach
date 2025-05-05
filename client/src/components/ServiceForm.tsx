@@ -67,12 +67,12 @@ export default function ServiceForm({
   const serviceMutation = useMutation({
     mutationFn: async (data: ServiceFormData) => {
       // Prepare data for API
-      // Convert string date to Date object for the API
+      // Let the schema handle date conversion
       const serviceData = {
         customerId: customerId,
         serviceName: data.serviceName,
         staffName: data.staffName || null,
-        serviceDate: new Date(data.serviceDate),
+        serviceDate: data.serviceDate,
         notes: data.notes || null
       };
 
