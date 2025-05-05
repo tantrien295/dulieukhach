@@ -134,14 +134,15 @@ export async function createCustomer(customerData: CustomerInsert) {
     };
     
     // Loại bỏ các trường undefined trước khi insert
-    Object.keys(sanitizedData).forEach(key => {
-      if (sanitizedData[key] === undefined) {
-        delete sanitizedData[key];
+    const cleanedData = {} as Record<string, any>;
+    Object.entries(sanitizedData).forEach(([key, value]) => {
+      if (value !== undefined) {
+        cleanedData[key] = value;
       }
     });
     
-    console.log("Sanitized data before insert:", JSON.stringify(sanitizedData));
-    const [newCustomer] = await db.insert(customers).values(sanitizedData).returning();
+    console.log("Sanitized data before insert:", JSON.stringify(cleanedData));
+    const [newCustomer] = await db.insert(customers).values(cleanedData).returning();
     return newCustomer;
   } catch (error) {
     console.error("Error in createCustomer:", error);
@@ -158,12 +159,24 @@ export async function updateCustomer(id: number, customerData: CustomerInsert) {
       // Chuyển đổi Date thành string nếu cần
       birthdate: customerData.birthdate instanceof Date 
         ? customerData.birthdate.toISOString() 
-        : customerData.birthdate
+        : customerData.birthdate,
+      // Đảm bảo các trường không bắt buộc có giá trị phù hợp
+      address: customerData.address || null,
+      notes: customerData.notes || null
     };
     
+    // Loại bỏ các trường undefined trước khi update
+    const cleanedData = {} as Record<string, any>;
+    Object.entries(sanitizedData).forEach(([key, value]) => {
+      if (value !== undefined) {
+        cleanedData[key] = value;
+      }
+    });
+    
+    console.log("Sanitized data before update:", JSON.stringify(cleanedData));
     const [updatedCustomer] = await db
       .update(customers)
-      .set(sanitizedData)
+      .set(cleanedData)
       .where(eq(customers.id, id))
       .returning();
     
