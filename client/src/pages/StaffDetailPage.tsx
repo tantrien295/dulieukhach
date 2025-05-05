@@ -88,9 +88,7 @@ export default function StaffDetailPage() {
   // Mutation for removing service assignment
   const removeServiceMutation = useMutation({
     mutationFn: async (assignmentId: number) => {
-      return apiRequest(`/api/staff/assignments/${assignmentId}`, {
-        method: "DELETE"
-      });
+      return apiRequest(`/api/staff/assignments/${assignmentId}`, "DELETE");
     },
     onSuccess: () => {
       toast({
@@ -230,7 +228,7 @@ export default function StaffDetailPage() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {staffMember.serviceAssignments.map((assignment) => (
+                  {staffMember.serviceAssignments.map((assignment: StaffServiceAssignment & { serviceType?: ServiceType & { category?: any } }) => (
                     <div key={assignment.id} className="flex items-center justify-between border-b pb-2">
                       <div>
                         <h3 className="font-medium">{assignment.serviceType?.name}</h3>
@@ -239,12 +237,12 @@ export default function StaffDetailPage() {
                             {assignment.serviceType?.category?.name || "Uncategorized"}
                           </Badge>
                           <span className="mr-2">
-                            {typeof assignment.serviceType?.price === 'number' 
-                              ? new Intl.NumberFormat('vi-VN', {
+                            {typeof assignment.serviceType?.price === 'string' 
+                              ? assignment.serviceType?.price
+                              : assignment.serviceType?.price ? new Intl.NumberFormat('vi-VN', {
                                   style: 'currency',
                                   currency: 'VND'
-                                }).format(assignment.serviceType.price)
-                              : assignment.serviceType?.price}
+                                }).format(Number(assignment.serviceType.price)) : ''}
                           </span>
                           <span>
                             {assignment.serviceType?.durationMinutes} min
@@ -285,7 +283,7 @@ export default function StaffDetailPage() {
                 {availableServiceTypes && availableServiceTypes.length > 0 ? (
                   availableServiceTypes.map((type) => (
                     <SelectItem key={type.id} value={type.id.toString()}>
-                      {type.name} ({type.category?.name})
+                      {type.name} 
                     </SelectItem>
                   ))
                 ) : (

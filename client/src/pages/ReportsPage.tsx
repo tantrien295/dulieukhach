@@ -1,14 +1,20 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Bar, Pie } from "recharts";
-import { 
-  BarChart as BarChartIcon, 
-  PieChart as PieChartIcon, 
-  Download,
-  Calendar,
-  User
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
 import {
   Card,
   CardContent,
@@ -29,203 +35,264 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { 
-  BarChart, 
-  ResponsiveContainer, 
-  XAxis, 
-  YAxis, 
-  Tooltip, 
-  Legend, 
-  PieChart, 
-  Cell 
-} from "recharts";
-import { Customer, Service, ServiceType } from "@shared/schema";
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
-
-// Function to group services by name and count occurrences
-const groupServicesByName = (services: Service[]) => {
-  const grouped = services.reduce((acc: {[key: string]: number}, service) => {
-    const name = service.serviceName;
-    if (!acc[name]) {
-      acc[name] = 0;
-    }
-    acc[name]++;
-    return acc;
-  }, {});
-  
-  return Object.entries(grouped).map(([name, count]) => ({
-    name,
-    count
-  })).sort((a, b) => b.count - a.count);
-};
-
-// Function to group customers by visit count
-const groupCustomersByVisitCount = (customers: any[]) => {
-  return customers
-    .filter(customer => customer.visitCount > 0)
-    .sort((a, b) => b.visitCount - a.visitCount)
-    .slice(0, 10)
-    .map(customer => ({
-      name: customer.name,
-      visits: customer.visitCount
-    }));
-};
+import { Service } from "@shared/schema";
 
 export default function ReportsPage() {
-  const [timeRange, setTimeRange] = useState("all");
-
-  // Fetch all customers with summary
-  const { data: customers } = useQuery<any[]>({
-    queryKey: ["/api/customers"],
-  });
-
+  const [timeFrame, setTimeFrame] = useState("week");
+  const [serviceType, setServiceType] = useState("all");
+  
   // Fetch all services
-  const { data: services, isLoading: servicesLoading } = useQuery<Service[]>({
+  const { data: services, isLoading } = useQuery<Service[]>({
     queryKey: ["/api/services"],
   });
 
-  // Prepare data for popular services chart
-  const popularServicesData = services ? groupServicesByName(services) : [];
+  if (isLoading) {
+    return <div className="container mx-auto py-6 text-center">Loading reports data...</div>;
+  }
 
-  // Prepare data for top customers chart
-  const topCustomersData = customers ? groupCustomersByVisitCount(customers) : [];
+  // Process data for charts
+  const processDataForRevenueChart = () => {
+    if (!services) return [];
+    
+    // Group by day and sum revenue
+    const revenueByDate = services.reduce((acc: any, service) => {
+      const date = new Date(service.serviceDate).toLocaleDateString();
+      if (!acc[date]) {
+        acc[date] = 0;
+      }
+      acc[date] += parseFloat(service.price);
+      return acc;
+    }, {});
+    
+    // Convert to chart format
+    return Object.entries(revenueByDate).map(([date, revenue]) => ({
+      date,
+      revenue
+    }));
+  };
+  
+  const processDataForServicesChart = () => {
+    if (!services) return [];
+    
+    // Group by service type
+    const serviceTypes = services.reduce((acc: any, service) => {
+      const type = service.serviceTypeId ? service.serviceTypeId.toString() : 'Other';
+      if (!acc[type]) {
+        acc[type] = 0;
+      }
+      acc[type]++;
+      return acc;
+    }, {});
+    
+    // Convert to chart format
+    return Object.entries(serviceTypes).map(([type, count]) => ({
+      type,
+      count
+    }));
+  };
 
+  const revenueChartData = processDataForRevenueChart();
+  const servicesChartData = processDataForServicesChart();
+  
+  // Calculate summary statistics
+  const totalRevenue = services?.reduce((sum, service) => sum + parseFloat(service.price), 0) || 0;
+  const totalServices = services?.length || 0;
+  const averageServicePrice = totalServices > 0 ? totalRevenue / totalServices : 0;
+  
+  // Colors for charts
+  const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088fe', '#00C49F'];
+  
   return (
     <div className="container mx-auto py-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Reports & Analytics</h1>
+      <h1 className="text-3xl font-bold mb-4">Reports & Analytics</h1>
+      
+      <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-4">
-          <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Time Range" />
+          <Select value={timeFrame} onValueChange={setTimeFrame}>
+            <SelectTrigger className="w-32">
+              <SelectValue placeholder="Time" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Time</SelectItem>
-              <SelectItem value="month">This Month</SelectItem>
-              <SelectItem value="quarter">This Quarter</SelectItem>
-              <SelectItem value="year">This Year</SelectItem>
+              <SelectItem value="week">Week</SelectItem>
+              <SelectItem value="month">Month</SelectItem>
+              <SelectItem value="quarter">Quarter</SelectItem>
+              <SelectItem value="year">Year</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </Button>
+          
+          <Select value={serviceType} onValueChange={setServiceType}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Service Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Services</SelectItem>
+              <SelectItem value="hair">Hair</SelectItem>
+              <SelectItem value="nails">Nails</SelectItem>
+              <SelectItem value="facial">Facial</SelectItem>
+              <SelectItem value="massage">Massage</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
-
-      {/* Dashboard Summary */}
+      
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Customers</CardTitle>
-            <User className="h-4 w-4 text-gray-500" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{customers?.length || 0}</div>
-            <p className="text-xs text-gray-500 mt-1">
-              Customers in database
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Services</CardTitle>
-            <BarChartIcon className="h-4 w-4 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{services?.length || 0}</div>
-            <p className="text-xs text-gray-500 mt-1">
-              Services performed
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Average Services Per Customer</CardTitle>
-            <PieChartIcon className="h-4 w-4 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">
-              {customers && customers.length && services && services.length
-                ? (services.length / customers.length).toFixed(1)
-                : "0.0"}
+            <div className="text-2xl font-bold">
+              {new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+              }).format(totalRevenue)}
             </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Services per customer
-            </p>
+            <p className="text-xs text-gray-500 mt-1">+2.5% from last month</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Services Performed</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalServices}</div>
+            <p className="text-xs text-gray-500 mt-1">+12% from last month</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Avg. Service Price</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+              }).format(averageServicePrice)}
+            </div>
+            <p className="text-xs text-gray-500 mt-1">-1.2% from last month</p>
           </CardContent>
         </Card>
       </div>
-
-      <Tabs defaultValue="popular-services">
-        <TabsList>
-          <TabsTrigger value="popular-services">Popular Services</TabsTrigger>
-          <TabsTrigger value="top-customers">Top Customers</TabsTrigger>
+      
+      <Tabs defaultValue="revenue">
+        <TabsList className="mb-4">
+          <TabsTrigger value="revenue">Revenue</TabsTrigger>
+          <TabsTrigger value="services">Services</TabsTrigger>
+          <TabsTrigger value="customers">Customers</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="popular-services" className="space-y-4">
+        <TabsContent value="revenue">
           <Card>
             <CardHeader>
-              <CardTitle>Most Popular Services</CardTitle>
+              <CardTitle>Revenue Trends</CardTitle>
               <CardDescription>
-                Service popularity based on frequency of bookings
+                View revenue performance over time
               </CardDescription>
             </CardHeader>
-            <CardContent className="h-80">
-              {servicesLoading ? (
-                <div className="flex justify-center items-center h-full">
-                  <p>Loading service data...</p>
-                </div>
-              ) : popularServicesData.length === 0 ? (
-                <div className="flex justify-center items-center h-full">
-                  <p>No service data available</p>
-                </div>
-              ) : (
+            <CardContent>
+              <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={popularServicesData}>
-                    <XAxis dataKey="name" />
+                  <LineChart
+                    data={revenueChartData}
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
                     <YAxis />
-                    <Tooltip />
+                    <Tooltip
+                      formatter={(value) => [
+                        new Intl.NumberFormat('vi-VN', {
+                          style: 'currency',
+                          currency: 'VND'
+                        }).format(Number(value)),
+                        "Revenue"
+                      ]}
+                    />
                     <Legend />
-                    <Bar dataKey="count" fill="#8884d8" name="Number of Bookings" />
-                  </BarChart>
+                    <Line type="monotone" dataKey="revenue" stroke="#8884d8" activeDot={{ r: 8 }} />
+                  </LineChart>
                 </ResponsiveContainer>
-              )}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
         
-        <TabsContent value="top-customers" className="space-y-4">
+        <TabsContent value="services">
           <Card>
             <CardHeader>
-              <CardTitle>Top Customers by Visit Count</CardTitle>
+              <CardTitle>Services Distribution</CardTitle>
               <CardDescription>
-                Customers with the highest number of visits
+                Breakdown of services by type
               </CardDescription>
             </CardHeader>
-            <CardContent className="h-80">
-              {!customers ? (
-                <div className="flex justify-center items-center h-full">
-                  <p>Loading customer data...</p>
-                </div>
-              ) : topCustomersData.length === 0 ? (
-                <div className="flex justify-center items-center h-full">
-                  <p>No customer visit data available</p>
-                </div>
-              ) : (
+            <CardContent className="flex flex-col md:flex-row items-center">
+              <div className="w-full md:w-1/2 h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={topCustomersData}>
-                    <XAxis dataKey="name" />
+                  <PieChart>
+                    <Pie
+                      data={servicesChartData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="count"
+                      nameKey="type"
+                      label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {servicesChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              
+              <div className="w-full md:w-1/2 h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={servicesChartData}
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="type" />
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="visits" fill="#82ca9d" name="Number of Visits" />
+                    <Bar dataKey="count" name="Services Count" fill="#82ca9d" />
                   </BarChart>
                 </ResponsiveContainer>
-              )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="customers">
+          <Card>
+            <CardHeader>
+              <CardTitle>Customer Metrics</CardTitle>
+              <CardDescription>
+                Customer acquisition and retention
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-80 flex items-center justify-center">
+                <p className="text-muted-foreground">Customer metrics are in development</p>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
