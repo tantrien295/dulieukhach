@@ -41,7 +41,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { StaffMember, ServiceType } from "@shared/schema";
+import { StaffMember, ServiceType, StaffMemberWithServices, StaffServiceAssignment } from "@shared/schema";
 
 export default function StaffDetailPage() {
   const [matched, params] = useRoute("/staff/:id");
@@ -52,7 +52,7 @@ export default function StaffDetailPage() {
   const { toast } = useToast();
 
   // Fetch staff member details
-  const { data: staffMember, isLoading } = useQuery<StaffMember>({
+  const { data: staffMember, isLoading } = useQuery<StaffMemberWithServices>({
     queryKey: [`/api/staff/${staffId}`],
     enabled: !!staffId
   });
@@ -65,9 +65,7 @@ export default function StaffDetailPage() {
   // Mutation for assigning service to staff
   const assignServiceMutation = useMutation({
     mutationFn: async (serviceTypeId: number) => {
-      return apiRequest(`/api/staff/${staffId}/services/${serviceTypeId}`, {
-        method: "POST"
-      });
+      return apiRequest(`/api/staff/${staffId}/services/${serviceTypeId}`, "POST");
     },
     onSuccess: () => {
       toast({
@@ -123,7 +121,7 @@ export default function StaffDetailPage() {
   // Filter out already assigned services
   const availableServiceTypes = serviceTypes?.filter(type => {
     const assignments = staffMember?.serviceAssignments || [];
-    return !assignments.some(a => a.serviceTypeId === type.id);
+    return !assignments.some((a: StaffServiceAssignment) => a.serviceTypeId === type.id);
   });
 
   if (isLoading) {

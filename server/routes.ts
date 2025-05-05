@@ -131,6 +131,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).json({ error: 'Internal server error' });
     }
   });
+  
+  // Get all services across all customers (for reports)
+  app.get('/api/services', async (req, res) => {
+    try {
+      const services = await storage.getAllServices();
+      return res.json(services);
+    } catch (error) {
+      console.error('Error fetching all services:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
 
   app.post('/api/services', async (req, res) => {
     try {

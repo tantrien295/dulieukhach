@@ -22,14 +22,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { StaffMember, ServiceType } from "@shared/schema";
+import { StaffMember, ServiceType, StaffMemberWithServices } from "@shared/schema";
 
 export default function StaffPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isCreateStaffOpen, setIsCreateStaffOpen] = useState(false);
 
   // Fetch staff members
-  const { data: staffMembers, isLoading } = useQuery<StaffMember[]>({
+  const { data: staffMembers, isLoading } = useQuery<StaffMemberWithServices[]>({
     queryKey: ["/api/staff"],
   });
 
@@ -104,7 +104,7 @@ export default function StaffPage() {
 }
 
 interface StaffCardProps {
-  staff: StaffMember;
+  staff: StaffMemberWithServices;
 }
 
 function StaffCard({ staff }: StaffCardProps) {
@@ -142,7 +142,7 @@ function StaffCard({ staff }: StaffCardProps) {
             <div className="mt-4">
               <h4 className="text-sm font-medium mb-2">Services</h4>
               <div className="flex flex-wrap gap-2">
-                {serviceAssignments.slice(0, 3).map((assignment, index) => (
+                {serviceAssignments.slice(0, 3).map((assignment, index: number) => (
                   <Badge key={index} variant="outline">
                     {assignment.serviceType?.name || 'Unknown service'}
                   </Badge>
