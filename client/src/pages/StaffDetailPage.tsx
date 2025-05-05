@@ -69,8 +69,8 @@ export default function StaffDetailPage() {
     },
     onSuccess: () => {
       toast({
-        title: "Service assigned",
-        description: "Service has been assigned to staff member successfully",
+        title: "Đã gán dịch vụ",
+        description: "Dịch vụ đã được gán cho nhân viên thành công",
       });
       queryClient.invalidateQueries({ queryKey: [`/api/staff/${staffId}`] });
       setIsServiceAssignDialogOpen(false);
@@ -78,8 +78,8 @@ export default function StaffDetailPage() {
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to assign service",
+        title: "Lỗi",
+        description: error.message || "Không thể gán dịch vụ",
         variant: "destructive"
       });
     }
@@ -92,15 +92,15 @@ export default function StaffDetailPage() {
     },
     onSuccess: () => {
       toast({
-        title: "Service removed",
-        description: "Service has been removed from staff member successfully",
+        title: "Đã xóa dịch vụ",
+        description: "Dịch vụ đã được xóa khỏi nhân viên thành công",
       });
       queryClient.invalidateQueries({ queryKey: [`/api/staff/${staffId}`] });
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to remove service",
+        title: "Lỗi",
+        description: error.message || "Không thể xóa dịch vụ",
         variant: "destructive"
       });
     }
@@ -123,17 +123,17 @@ export default function StaffDetailPage() {
   });
 
   if (isLoading) {
-    return <div className="container mx-auto py-10 text-center">Loading staff details...</div>;
+    return <div className="container mx-auto py-10 text-center">Đang tải thông tin nhân viên...</div>;
   }
 
   if (!staffMember) {
     return (
       <div className="container mx-auto py-10 text-center">
-        <h1 className="text-xl font-semibold mb-4">Staff member not found</h1>
+        <h1 className="text-xl font-semibold mb-4">Không tìm thấy nhân viên</h1>
         <Link href="/staff">
           <Button>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Staff List
+            Quay lại Danh sách Nhân viên
           </Button>
         </Link>
       </div>
@@ -269,15 +269,15 @@ export default function StaffDetailPage() {
       <Dialog open={isServiceAssignDialogOpen} onOpenChange={setIsServiceAssignDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Assign Service</DialogTitle>
+            <DialogTitle>Gán Dịch Vụ</DialogTitle>
             <DialogDescription>
-              Select a service type to assign to {staffMember.name}.
+              Chọn loại dịch vụ để gán cho {staffMember.name}.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
             <Select value={selectedServiceTypeId} onValueChange={setSelectedServiceTypeId}>
               <SelectTrigger>
-                <SelectValue placeholder="Select a service" />
+                <SelectValue placeholder="Chọn một dịch vụ" />
               </SelectTrigger>
               <SelectContent>
                 {availableServiceTypes && availableServiceTypes.length > 0 ? (
@@ -288,7 +288,7 @@ export default function StaffDetailPage() {
                   ))
                 ) : (
                   <SelectItem value="no_services" disabled>
-                    No available services to assign
+                    Không có dịch vụ khả dụng để gán
                   </SelectItem>
                 )}
               </SelectContent>
@@ -296,13 +296,13 @@ export default function StaffDetailPage() {
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline">Hủy</Button>
             </DialogClose>
             <Button 
               onClick={handleAssignService} 
               disabled={!selectedServiceTypeId || assignServiceMutation.isPending}
             >
-              {assignServiceMutation.isPending ? 'Assigning...' : 'Assign Service'}
+              {assignServiceMutation.isPending ? 'Đang gán...' : 'Gán Dịch Vụ'}
             </Button>
           </DialogFooter>
         </DialogContent>
