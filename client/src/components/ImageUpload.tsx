@@ -3,6 +3,56 @@ import { Button } from "@/components/ui/button";
 import { X, Upload, Image } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+// Hàm nén hình ảnh trước khi chuyển sang base64
+const resizeImage = (file: File, maxWidth = 800, maxHeight = 600): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = document.createElement('img');
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+        
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          reject(new Error("Could not get canvas context"));
+          return;
+        }
+        
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convert to JPEG with quality 80% to reduce size
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
+        resolve(dataUrl);
+      };
+      img.onerror = () => {
+        reject(new Error("Failed to load image"));
+      };
+    };
+    reader.onerror = () => {
+      reject(new Error("Failed to read file"));
+    };
+  });
+};
+
 interface ImageUploadProps {
   onImagesUploaded: (imageUrls: string[]) => void;
 }
@@ -18,17 +68,28 @@ export default function ImageUpload({ onImagesUploaded }: ImageUploadProps) {
     }
   };
 
-  const processFiles = (files: FileList) => {
-    const newImages: string[] = [];
+  const processFiles = async (files: FileList) => {
     const fileArray = Array.from(files);
-
-    fileArray.forEach((file) => {
-      // For simplicity, we're using local URLs in this demo
-      // In a real app, you would upload to a server and get back URLs
-      const imageUrl = URL.createObjectURL(file);
-      newImages.push(imageUrl);
+    let newImages: string[] = [];
+    let errors = 0;
+    
+    // Hiển thị toast loading
+    toast({
+      title: "Đang xử lý hình ảnh",
+      description: "Vui lòng đợi trong khi hình ảnh được xử lý...",
     });
-
+    
+    for (const file of fileArray) {
+      try {
+        // Nén hình ảnh trước khi chuyển thành base64
+        const resizedImage = await resizeImage(file, 800, 600);
+        newImages.push(resizedImage);
+      } catch (error) {
+        console.error("Error processing image:", error);
+        errors++;
+      }
+    }
+    
     if (newImages.length > 0) {
       const updatedImages = [...images, ...newImages];
       setImages(updatedImages);
@@ -36,7 +97,13 @@ export default function ImageUpload({ onImagesUploaded }: ImageUploadProps) {
       
       toast({
         title: "Đã thêm hình ảnh",
-        description: `Đã thêm ${newImages.length} hình ảnh.`,
+        description: `Đã thêm ${newImages.length} hình ảnh${errors > 0 ? `, ${errors} lỗi` : ''}.`,
+      });
+    } else if (errors > 0) {
+      toast({
+        title: "Lỗi",
+        description: "Không thể xử lý hình ảnh.",
+        variant: "destructive",
       });
     }
   };
