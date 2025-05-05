@@ -79,10 +79,10 @@ export default function ServiceForm({
 
       if (isEditing && service) {
         // Update existing service
-        return apiRequest(`/api/services/${service.id}`, "PUT", serviceData);
+        return apiRequest("PUT", `/api/services/${service.id}`, serviceData);
       } else {
         // Create new service
-        return apiRequest("/api/services", "POST", serviceData);
+        return apiRequest("POST", "/api/services", serviceData);
       }
     },
     onSuccess: async (data) => {
@@ -92,7 +92,7 @@ export default function ServiceForm({
         
         // Add each image to the service
         for (const imageUrl of uploadedImages) {
-          await apiRequest(`/api/services/${serviceId}/images`, "POST", { imageUrl });
+          await apiRequest("POST", `/api/services/${serviceId}/images`, { imageUrl });
         }
       }
 
