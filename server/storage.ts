@@ -142,7 +142,16 @@ export async function createCustomer(customerData: CustomerInsert) {
     });
     
     console.log("Sanitized data before insert:", JSON.stringify(cleanedData));
-    const [newCustomer] = await db.insert(customers).values(cleanedData).returning();
+    // Đảm bảo có các trường bắt buộc cho bảng customers
+    const customerDataToInsert = {
+      name: cleanedData.name,
+      phone: cleanedData.phone,
+      birthdate: cleanedData.birthdate,
+      address: cleanedData.address,
+      notes: cleanedData.notes
+    };
+    
+    const [newCustomer] = await db.insert(customers).values(customerDataToInsert).returning();
     return newCustomer;
   } catch (error) {
     console.error("Error in createCustomer:", error);
@@ -174,9 +183,19 @@ export async function updateCustomer(id: number, customerData: CustomerInsert) {
     });
     
     console.log("Sanitized data before update:", JSON.stringify(cleanedData));
+    
+    // Đảm bảo có các trường phù hợp cho bảng customers
+    const customerDataToUpdate = {
+      name: cleanedData.name,
+      phone: cleanedData.phone,
+      birthdate: cleanedData.birthdate,
+      address: cleanedData.address,
+      notes: cleanedData.notes
+    };
+    
     const [updatedCustomer] = await db
       .update(customers)
-      .set(cleanedData)
+      .set(customerDataToUpdate)
       .where(eq(customers.id, id))
       .returning();
     
