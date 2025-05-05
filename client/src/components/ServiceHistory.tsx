@@ -39,14 +39,14 @@ export default function ServiceHistory({ customerId, onAddServiceClick }: Servic
       queryClient.invalidateQueries({ queryKey: [`/api/customers/${customerId}/services`] });
       queryClient.invalidateQueries({ queryKey: [`/api/customers/${customerId}`] });
       toast({
-        title: "Service deleted",
-        description: "The service has been deleted successfully.",
+        title: "Xóa thành công",
+        description: "Dịch vụ đã được xóa thành công.",
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to delete the service.",
+        title: "Lỗi",
+        description: error.message || "Không thể xóa dịch vụ.",
         variant: "destructive",
       });
     },
@@ -58,7 +58,7 @@ export default function ServiceHistory({ customerId, onAddServiceClick }: Servic
   };
 
   const handleDeleteService = (serviceId: number) => {
-    if (window.confirm("Are you sure you want to delete this service?")) {
+    if (window.confirm("Bạn có chắc chắn muốn xóa dịch vụ này không?")) {
       deleteServiceMutation.mutate(serviceId);
     }
   };
@@ -182,7 +182,7 @@ function ServiceImages({ serviceId }: ServiceImagesProps) {
   return (
     <div className="mt-3">
       <div className="flex items-center text-sm font-medium mb-2">
-        <ImageIcon className="h-4 w-4 mr-1" /> Images
+        <ImageIcon className="h-4 w-4 mr-1" /> Hình Ảnh
       </div>
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
         {images.map((image) => (

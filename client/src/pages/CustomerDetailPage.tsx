@@ -103,10 +103,10 @@ export default function CustomerDetailPage() {
             <span className="text-neutral-medium">#{customer.id}</span>
           </div>
           <div className="flex items-center space-x-3">
-            <button className="text-neutral-dark hover:text-[#5C6BC0]" title="Call customer">
+            <button className="text-neutral-dark hover:text-[#5C6BC0]" title="Gọi khách hàng">
               <Phone className="h-5 w-5" />
             </button>
-            <button className="text-neutral-dark hover:text-[#5C6BC0]" title="Email customer">
+            <button className="text-neutral-dark hover:text-[#5C6BC0]" title="Gửi email">
               <Mail className="h-5 w-5" />
             </button>
             <button 
@@ -116,7 +116,7 @@ export default function CustomerDetailPage() {
               <Plus className="h-5 w-5 mr-1" />
               Thêm Dịch Vụ
             </button>
-            <button className="text-neutral-dark hover:text-[#5C6BC0] p-1 ml-2" title="More options">
+            <button className="text-neutral-dark hover:text-[#5C6BC0] p-1 ml-2" title="Tùy chọn khác">
               <MoreHorizontal className="h-5 w-5" />
             </button>
           </div>

@@ -155,7 +155,7 @@ export default function CustomerForm({ customer, isEditing = false }: CustomerFo
               <ChevronLeft className="h-5 w-5 text-neutral-dark" />
             </button>
             <h2 className="text-xl font-semibold">
-              {isEditing ? "Edit Customer" : "Add New Customer"}
+              {isEditing ? "Sửa Thông Tin Khách Hàng" : "Thêm Khách Hàng Mới"}
             </h2>
           </div>
         </div>
@@ -165,17 +165,17 @@ export default function CustomerForm({ customer, isEditing = false }: CustomerFo
         <div className="max-w-2xl mx-auto">
           <div className="card">
             <div className="card-header">
-              <h3 className="font-semibold">Customer Information</h3>
+              <h3 className="font-semibold">Thông Tin Khách Hàng</h3>
             </div>
             <div className="card-content">
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="block text-sm font-medium mb-1">Full Name*</label>
+                    <label className="block text-sm font-medium mb-1">Họ Tên*</label>
                     <input 
                       type="text" 
                       className={`form-input ${errors.name ? 'border-red-500' : ''}`}
-                      placeholder="Enter full name" 
+                      placeholder="Nhập họ tên đầy đủ" 
                       {...register("name")}
                     />
                     {errors.name && (
