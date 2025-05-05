@@ -35,8 +35,8 @@ export default function ImageUpload({ onImagesUploaded }: ImageUploadProps) {
       onImagesUploaded(updatedImages);
       
       toast({
-        title: "Images added",
-        description: `${newImages.length} image(s) have been added.`,
+        title: "Đã thêm hình ảnh",
+        description: `Đã thêm ${newImages.length} hình ảnh.`,
       });
     }
   };
@@ -88,8 +88,8 @@ export default function ImageUpload({ onImagesUploaded }: ImageUploadProps) {
         onDragOver={handleDragOver}
       >
         <Upload className="h-8 w-8 text-gray-400 mb-2" />
-        <p className="text-sm text-gray-500">Click to upload or drag and drop</p>
-        <p className="text-xs text-gray-400 mt-1">JPG, PNG or GIF files</p>
+        <p className="text-sm text-gray-500">Bấm để tải lên hoặc kéo thả hình ảnh</p>
+        <p className="text-xs text-gray-400 mt-1">File định dạng JPG, PNG hoặc GIF</p>
       </div>
 
       {images.length > 0 && (

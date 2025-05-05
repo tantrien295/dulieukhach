@@ -28,10 +28,10 @@ import { useToast } from "@/hooks/use-toast";
 import ImageUpload from "@/components/ImageUpload";
 
 const serviceFormSchema = z.object({
-  serviceName: z.string().min(2, "Service name must be at least 2 characters"),
-  price: z.string().min(1, "Price is required"),
+  serviceName: z.string().min(2, "Tên dịch vụ phải có ít nhất 2 ký tự"),
+  price: z.string().min(1, "Vui lòng nhập giá tiền"),
   notes: z.string().optional(),
-  serviceDate: z.date({ required_error: "Service date is required" }),
+  serviceDate: z.date({ required_error: "Vui lòng chọn ngày thực hiện" }),
   serviceTypeId: z.string().optional(),
 });
 
@@ -102,10 +102,10 @@ export default function ServiceForm({
       
       // Show success message
       toast({
-        title: isEditing ? "Service updated" : "Service added",
+        title: isEditing ? "Đã cập nhật dịch vụ" : "Đã thêm dịch vụ",
         description: isEditing 
-          ? "The service has been updated successfully." 
-          : "The service has been added successfully.",
+          ? "Dịch vụ đã được cập nhật thành công." 
+          : "Dịch vụ đã được thêm thành công.",
       });
 
       // Reset form and close
@@ -114,8 +114,8 @@ export default function ServiceForm({
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "An error occurred while saving the service.",
+        title: "Lỗi",
+        description: error.message || "Đã xảy ra lỗi khi lưu dịch vụ.",
         variant: "destructive",
       });
     },
