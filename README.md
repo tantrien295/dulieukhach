@@ -1,38 +1,65 @@
 # Quản Lý Salon
 
-Quản Lý Salon là một ứng dụng quản lý khách hàng toàn diện cho các salon và spa, cung cấp công cụ mạnh mẽ để theo dõi thông tin khách hàng và lịch sử dịch vụ.
+Hệ thống quản lý khách hàng toàn diện dành cho các salon và spa, cung cấp khả năng theo dõi mạnh mẽ về dịch vụ khách hàng, quản lý hồ sơ chi tiết, và các công cụ vận hành kinh doanh trực quan.
 
 ## Tính năng chính
 
-- Quản lý thông tin khách hàng
-- Theo dõi lịch sử dịch vụ và ghi chú
-- Quản lý nhân viên và phân công dịch vụ
-- Báo cáo và phân tích doanh thu
-- Tải lên hình ảnh trước và sau khi cung cấp dịch vụ
-- Giao diện người dùng trực quan và dễ sử dụng
+- **Quản lý khách hàng**: Lưu trữ thông tin chi tiết về khách hàng, theo dõi lịch sử thăm khám
+- **Theo dõi dịch vụ**: Ghi lại tất cả các dịch vụ được cung cấp, kèm hình ảnh và ghi chú
+- **Quản lý nhân viên**: Phân công nhân viên cho các loại dịch vụ cụ thể
+- **Báo cáo và phân tích**: Xem thông tin tổng quan về hoạt động kinh doanh
 
 ## Công nghệ sử dụng
 
-- Frontend: React, TypeScript, TailwindCSS
-- Backend: Express.js, Node.js
-- Cơ sở dữ liệu: PostgreSQL với Drizzle ORM
-- Xây dựng và đóng gói: Vite
+- **Frontend**: React.js, TypeScript, Tailwind CSS
+- **Backend**: Node.js, Express
+- **Cơ sở dữ liệu**: PostgreSQL với Drizzle ORM
+- **Tối ưu hóa hình ảnh**: Tự động nén và tạo thumbnail
+- **Trải nghiệm người dùng**: Giao diện trực quan và dễ sử dụng
 
-## Triển khai
+## Trang web giới thiệu
 
-Ứng dụng này có thể được triển khai trên các nền tảng sau:
+Bạn có thể xem trang web giới thiệu sản phẩm [tại đây](https://yourusername.github.io/salon-management).
 
-- Replit: Dùng tính năng "Deploy" có sẵn
-- GitHub Pages: Triển khai tĩnh frontend (yêu cầu cấu hình backend riêng)
-- Render: Triển khai fullstack
+## Cài đặt và sử dụng
 
-## Hướng dẫn sử dụng
+### Yêu cầu hệ thống
+- Node.js phiên bản 18 trở lên
+- PostgreSQL
+- NPM hoặc Yarn
 
-1. Thêm/sửa/xóa thông tin khách hàng
-2. Ghi lại các dịch vụ đã cung cấp cho khách hàng
-3. Tải lên hình ảnh trước và sau khi cung cấp dịch vụ
-4. Xem báo cáo và phân tích doanh thu
+### Hướng dẫn cài đặt
+1. Clone repository
+   ```
+   git clone https://github.com/yourusername/salon-management.git
+   cd salon-management
+   ```
+
+2. Cài đặt các phụ thuộc
+   ```
+   npm install
+   ```
+
+3. Tạo file .env từ file mẫu
+   ```
+   cp .env.example .env
+   ```
+
+4. Cập nhật thông tin kết nối cơ sở dữ liệu trong file .env
+
+5. Chạy ứng dụng
+   ```
+   npm run dev
+   ```
+
+## Đóng góp
+
+Chúng tôi hoan nghênh mọi đóng góp! Vui lòng đọc hướng dẫn đóng góp trước khi bắt đầu.
+
+## Giấy phép
+
+Dự án này được phân phối theo giấy phép MIT.
 
 ---
 
-&copy; 2023 Quản Lý Salon. Tất cả các quyền được bảo lưu.
+&copy; 2025 Quản Lý Salon. Mọi quyền được bảo lưu.

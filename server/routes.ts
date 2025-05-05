@@ -432,8 +432,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(404).json({ error: 'Service category not found' });
         }
         return res.status(204).end();
-      } catch (deleteError) {
-        return res.status(400).json({ error: deleteError.message });
+      } catch (deleteError: any) {
+        return res.status(400).json({ error: deleteError?.message || 'Error deleting service category' });
       }
     } catch (error) {
       console.error('Error deleting service category:', error);
@@ -522,8 +522,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(404).json({ error: 'Service type not found' });
         }
         return res.status(204).end();
-      } catch (deleteError) {
-        return res.status(400).json({ error: deleteError.message });
+      } catch (deleteError: any) {
+        return res.status(400).json({ error: deleteError?.message || 'Error deleting service type' });
       }
     } catch (error) {
       console.error('Error deleting service type:', error);
