@@ -18,13 +18,16 @@ import {
 
 // Function to get all customers with summary info
 export async function getCustomersWithSummary() {
-  // First get all customers
-  const allCustomers = await db.query.customers.findMany({
-    orderBy: desc(customers.createdAt)
-  });
+  try {
+    console.log("Attempting to fetch all customers from database...");
+    // First get all customers
+    const allCustomers = await db.query.customers.findMany({
+      orderBy: desc(customers.createdAt)
+    });
+    console.log(`Successfully fetched ${allCustomers.length} customers from database`);
 
-  // For each customer, get their visit count and last service
-  const customersWithSummary = await Promise.all(allCustomers.map(async (customer) => {
+    // For each customer, get their visit count and last service
+    const customersWithSummary = await Promise.all(allCustomers.map(async (customer) => {
     // Get services count for this customer
     const visitCountResult = await db
       .select({ count: count() })
@@ -52,6 +55,10 @@ export async function getCustomersWithSummary() {
   }));
 
   return customersWithSummary;
+  } catch (error) {
+    console.error("Error in getCustomersWithSummary:", error);
+    throw error; // Re-throw to be handled by the route handler
+  }
 }
 
 // Function to get a customer by ID with visit count
