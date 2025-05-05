@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Plus, Edit, Trash, Scissors, Calendar, CircleDollarSign, Image as ImageIcon } from "lucide-react";
+import { Loader2, Plus, Edit, Trash, Scissors, Calendar, CircleDollarSign, Image as ImageIcon, X } from "lucide-react";
 import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
@@ -172,6 +172,8 @@ interface ServiceImagesProps {
 }
 
 function ServiceImages({ serviceId }: ServiceImagesProps) {
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  
   // Fetch images for the service
   const { data: images, isLoading } = useQuery<ServiceImage[]>({
     queryKey: [`/api/services/${serviceId}/images`],
@@ -186,15 +188,40 @@ function ServiceImages({ serviceId }: ServiceImagesProps) {
       </div>
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
         {images.map((image) => (
-          <div key={image.id} className="h-20 w-full rounded-md overflow-hidden">
+          <div 
+            key={image.id} 
+            className="h-20 w-full rounded-md overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+            onClick={() => setSelectedImage(image.imageUrl)}
+          >
             <img
               src={image.imageUrl}
-              alt="Service"
+              alt="Hình ảnh dịch vụ"
               className="h-full w-full object-cover"
             />
           </div>
         ))}
       </div>
+
+      {/* Modal xem hình ảnh lớn */}
+      <Dialog open={!!selectedImage} onOpenChange={(open) => !open && setSelectedImage(null)}>
+        <DialogContent className="sm:max-w-[85vw] h-auto max-h-[85vh] p-0 bg-transparent border-none shadow-none">
+          <div className="relative">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="absolute top-2 right-2 bg-white/80 hover:bg-white/90 z-10 rounded-full"
+              onClick={() => setSelectedImage(null)}
+            >
+              <X className="h-4 w-4 text-gray-700" />
+            </Button>
+            <img
+              src={selectedImage || ''}
+              alt="Hình ảnh phóng to"
+              className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
